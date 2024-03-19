@@ -1,6 +1,6 @@
 import os, logging, sqlite3
 from datetime import datetime
-from helpers import login_required, get_db, close_db
+from helpers import login_required, get_db, close_db, test_verify_function
 from flask import Flask, flash, jsonify, render_template, redirect, session, request, url_for
 from werkzeug.security import check_password_hash, generate_password_hash
 
@@ -62,6 +62,16 @@ def active_list_add_item():
         return redirect(url_for('active_list_data'))
 
     valid_item = db.execute("SELECT * FROM item WHERE user_id = ? AND item_name = ? COLLATE NOCASE", (session['user_id'], item_to_add,)).fetchone()
+
+
+
+    if test_verify_function(session['user_id'], item_to_add):
+        app.logger.error('true')
+    else:
+        app.logger.error('false')
+
+
+
     if not valid_item:
         db.execute("INSERT INTO item (user_id, item_name) VALUES (?, ?)", (session['user_id'], item_to_add,))
         db.commit()

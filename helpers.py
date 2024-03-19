@@ -31,3 +31,14 @@ def close_db(e=None):
 
 
 
+def test_verify_function(user_id, item_name):
+
+    db = get_db()
+    valid_item = db.execute('SELECT * FROM item WHERE user_id = ? AND item_name = ?', (user_id, item_name),).fetchone()
+    if valid_item:
+        close_db()
+        return True
+    else:
+        close_db()
+        return False
+    
