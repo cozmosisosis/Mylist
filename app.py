@@ -1,6 +1,6 @@
 import os, logging, sqlite3
 from datetime import datetime
-from helpers import login_required, get_db, close_db, test_verify_function
+from helpers import login_required, get_db, close_db, valid_item_name_for_user
 from flask import Flask, flash, jsonify, render_template, redirect, session, request, url_for
 from werkzeug.security import check_password_hash, generate_password_hash
 
@@ -64,12 +64,12 @@ def active_list_add_item():
     valid_item = db.execute("SELECT * FROM item WHERE user_id = ? AND item_name = ? COLLATE NOCASE", (session['user_id'], item_to_add,)).fetchone()
 
 
-
-    if test_verify_function(session['user_id'], item_to_add):
+    test = valid_item_name_for_user(session['user_id'], item_to_add)
+    if test:
         app.logger.error('true')
+        app.logger.error(test['item_id'])
     else:
         app.logger.error('false')
-
 
 
     if not valid_item:
@@ -911,8 +911,7 @@ def my_items():
 def my_items_data():
 
     db = get_db()
-    item = db.execute("SELECT * FROM item WHERE user_id = ? ORDER BY item_name", (session['user_id'],))
-    item = list(item)
+    item = list(db.execute("SELECT * FROM item WHERE user_id = ? ORDER BY item_name", (session['user_id'],)))
     close_db()
     return jsonify(render_template('/ajax_templates/ajax_my_items.html', item=item))
 
