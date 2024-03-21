@@ -1,6 +1,6 @@
 import os, logging, sqlite3
 from datetime import datetime
-from helpers import login_required, get_db, close_db, valid_item_name_for_user
+from helpers import login_required, get_db, close_db, get_item_by_name_for_user, get_item_by_id_for_user, create_item_for_user, add_item_to_active_list, get_active_item_with_null_group, update_active_item_with_null_group_quantity
 from flask import Flask, flash, jsonify, render_template, redirect, session, request, url_for
 from werkzeug.security import check_password_hash, generate_password_hash
 
@@ -52,46 +52,28 @@ def old_index():
 @login_required
 def active_list_add_item():
 
-    db = get_db()
     item_to_add = request.form.get('item_to_add').strip()
     quantity_to_add = request.form.get('quantity')
     quantity_to_add_int = int(quantity_to_add)
     if not item_to_add or not quantity_to_add or quantity_to_add_int < 1:
-        # implement error message
-        close_db()
         return redirect(url_for('active_list_data'))
 
-    valid_item = db.execute("SELECT * FROM item WHERE user_id = ? AND item_name = ? COLLATE NOCASE", (session['user_id'], item_to_add,)).fetchone()
-
-
-    test = valid_item_name_for_user(session['user_id'], item_to_add)
-    if test:
-        app.logger.error('true')
-        app.logger.error(test['item_id'])
-    else:
-        app.logger.error('false')
-
+    valid_item = get_item_by_name_for_user(item_to_add, session['user_id'])
 
     if not valid_item:
-        db.execute("INSERT INTO item (user_id, item_name) VALUES (?, ?)", (session['user_id'], item_to_add,))
-        db.commit()
-        new_item = db.execute("SELECT * FROM item WHERE user_id = ? AND item_name = ?", (session['user_id'], item_to_add)).fetchone()
-        db.execute("INSERT INTO user_active_items (user_id, item_id, active_items_quantity) VALUES (?, ?, ?)", (session['user_id'], new_item['item_id'], quantity_to_add_int,))
-        db.commit()
-        close_db()
+
+        create_item_for_user(item_to_add, session['user_id'])
+        new_item = get_item_by_name_for_user(item_to_add, session['user_id'])
+        add_item_to_active_list(new_item['item_id'], session['user_id'], quantity_to_add_int)
         return redirect(url_for('active_list_data'))
     
-    item_on_list = db.execute("SELECT * FROM user_active_items WHERE user_id = ? AND item_id = ? AND groups_id IS NULL", (session['user_id'], valid_item['item_id'], )).fetchone()
+    item_on_list = get_active_item_with_null_group(valid_item['item_id'], session['user_id'])
     if item_on_list:
         new_quantity = item_on_list['active_items_quantity'] + quantity_to_add_int
-        db.execute("UPDATE user_active_items SET active_items_quantity = ? WHERE user_id = ? AND item_id = ?", (new_quantity, session['user_id'], valid_item['item_id'],))
-        db.commit()
-        close_db()
+        update_active_item_with_null_group_quantity(valid_item['item_id'], session['user_id'], new_quantity)
         return redirect(url_for('active_list_data'))
     
-    db.execute("INSERT INTO user_active_items (user_id, item_id, active_items_quantity) VALUES (?, ?, ?)", (session['user_id'], valid_item['item_id'], quantity_to_add_int))
-    db.commit()
-    close_db()
+    add_item_to_active_list(valid_item['item_id'], session['user_id'], quantity_to_add_int)
     return redirect(url_for('active_list_data'))
 
 

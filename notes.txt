@@ -4,7 +4,9 @@
 FIXED   When adding items from group, if one of the quantities of items is not filled out the operation fails.
 FIXED   Combine pages edit groups and my groups into one page.
 FIXED   Error caused by mixing up my groups and edit groups resources seen when adding item to group from edit group page
+FIXED   Adding item to new list where item is already in list will increse quantity for all of item regardless where it was added from
 
+        Autofocus does not work after ajax method is used, only on page first load.
         Error when adding from group, if error occurs nothing happens (change a value to an invalid one and try submiting) need to decide on what system to ajax or load new page.
         Adding all ingredients button works but I want it to redirect to the homepage.
         Change method for updating page data, change from replacewith function to innerHTML to avoid repetation of div with id tag.
