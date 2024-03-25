@@ -69,12 +69,42 @@ def add_item_to_active_list(item_id, user_id, quantity):
 
 
 
+def add_item_to_active_list_from_group(user_id, item_id, groups_id, quantity):
+
+    db = get_db()
+    db.execute('INSERT INTO user_active_items (user_id, item_id, groups_id, active_items_quantity) VALUES (?, ?, ?, ?)', (user_id, item_id, groups_id, quantity))
+    db.commit()
+    close_db()
+    return True
+
+
+
+def get_single_user_active_item(user_id, item_id, groups_id):
+    
+    db = get_db()
+    item = db.execute('SELECT * FROM user_active_items WHERE user_id = ? AND item_id = ? AND groups_id = ?', (user_id, item_id, groups_id,)).fetchone()
+    close_db()
+    return item
+
+
+
+
 def get_active_item_with_null_group(item_id, user_id):
     
     db = get_db()
     item = db.execute('SELECT * FROM user_active_items WHERE item_id = ? AND user_id = ? AND groups_id IS NULL', (item_id, user_id)).fetchone()
     close_db()
     return item
+
+
+
+def update_active_item_quantity(new_quantity, user_id, item_id, groups_id):
+
+    db = get_db()
+    db.execute('UPDATE user_active_items SET active_items_quantity = ? WHERE user_id = ? AND item_id = ? AND groups_id = ?', (new_quantity, user_id, item_id, groups_id,))
+    db.commit()
+    close_db()
+    return True
 
 
 
@@ -85,3 +115,32 @@ def update_active_item_with_null_group_quantity(item_id, user_id, quantity):
     db.commit()
     close_db()
     return True
+
+
+
+def get_users_groups(user_id):
+
+    db = get_db()
+    groups = list(db.execute('SELECT * FROM groups WHERE user_id = ?', (user_id,)))
+    close_db()
+    return groups
+
+
+
+def get_users_items(user_id):
+
+    db = get_db()
+    items = list(db.execute('SELECT * FROM item WHERE user_id = ? ORDER BY item_name', (user_id,)))
+    close_db()
+    return items
+
+
+
+def get_users_active_items(user_id):
+    
+    db = get_db()
+    users_active_items = list(db.execute('SELECT * FROM user_active_items JOIN item ON user_active_items.item_id = item.item_id WHERE user_active_items.user_id = ? ORDER BY item.item_name', (user_id,)))
+    close_db()
+    return users_active_items
+
+

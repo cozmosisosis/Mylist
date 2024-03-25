@@ -1,6 +1,6 @@
 import os, logging, sqlite3
 from datetime import datetime
-from helpers import login_required, get_db, close_db, get_item_by_name_for_user, get_item_by_id_for_user, create_item_for_user, add_item_to_active_list, get_active_item_with_null_group, update_active_item_with_null_group_quantity
+from helpers import login_required, get_db, close_db, get_item_by_name_for_user, get_item_by_id_for_user, create_item_for_user, add_item_to_active_list, get_active_item_with_null_group, update_active_item_with_null_group_quantity, get_users_groups, get_users_items, get_users_active_items, get_single_user_active_item, update_active_item_quantity, add_item_to_active_list_from_group
 from flask import Flask, flash, jsonify, render_template, redirect, session, request, url_for
 from werkzeug.security import check_password_hash, generate_password_hash
 
@@ -133,7 +133,6 @@ def old_add_from_group():
 def add_from_group():
     
     error = None
-    db = get_db()
     items = request.form
 
 
@@ -141,7 +140,7 @@ def add_from_group():
         if key == 'groups_id':
             groups_id = items[key]
         else:
-            valid_item = db.execute("SELECT * FROM item WHERE user_id = ? AND item_id = ?", (session['user_id'], key,)).fetchone()
+            valid_item = get_item_by_id_for_user(key, session['user_id'])
             if not valid_item:
                 error = 'Invalid Item in submission'
 
@@ -156,30 +155,25 @@ def add_from_group():
 
 
     if error:
-        app.logger.error('error found, should return ajax_index')
-        users_groups = list(db.execute("SELECT * FROM groups WHERE user_id = ?", (session['user_id'],)))
-        users_items = list(db.execute("SELECT * FROM item WHERE user_id = ? ORDER BY item_name", (session['user_id'],)))
-        user_active_items = list(db.execute("SELECT * FROM user_active_items JOIN item ON user_active_items.item_id = item.item_id WHERE user_active_items.user_id = ? ORDER BY item.item_name", (session['user_id'],)))
-        close_db()
+        users_groups = get_users_groups(session['user_id'])
+        users_items = get_users_items(session['user_id'])
+        user_active_items = get_users_active_items(session['user_id'])
         return jsonify(render_template('/ajax_templates/ajax_index.html', users_groups=users_groups, users_items=users_items, user_active_items=user_active_items, error=error))
     
 
     for key in items:
         if key != 'groups_id':
 
-            item_in_list = db.execute("SELECT * FROM user_active_items WHERE user_id = ? AND item_id = ? AND groups_id = ?", (session['user_id'], key, groups_id)).fetchone()
+            item_in_list = get_single_user_active_item(session['user_id'], key, groups_id)
 
             if int(items[key]) != 0:
                 if not item_in_list:
-                    db.execute("INSERT INTO user_active_items (user_id, item_id, groups_id, active_items_quantity) VALUES (?, ?, ?, ?)", (session['user_id'], key, groups_id, int(items[key])))
-                    db.commit()
+                    add_item_to_active_list_from_group(session['user_id'], key, groups_id, int(items[key]))
                 else:
                     new_quantity = int(items[key]) + item_in_list['active_items_quantity']
-                    db.execute("UPDATE user_active_items SET active_items_quantity = ? WHERE user_id = ? AND item_id = ? AND groups_id = ?", (new_quantity, session['user_id'], key, groups_id))
-                    db.commit()
+                    update_active_item_quantity(new_quantity, session['user_id'], key, groups_id)
 
             
-    close_db()
     return redirect(url_for('index'))
     
 # Changing group add end
