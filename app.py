@@ -1,5 +1,6 @@
 import os, logging, sqlite3
 from datetime import datetime
+import helpers as h
 from helpers import login_required, get_db, close_db, get_item_by_name_for_user, get_item_by_id_for_user, create_item_for_user, add_item_to_active_list, get_active_item_with_null_group, update_active_item_with_null_group_quantity, get_users_groups, get_users_items, get_users_active_items, get_single_user_active_item, update_active_item_quantity, add_item_to_active_list_from_group
 from flask import Flask, flash, jsonify, render_template, redirect, session, request, url_for
 from werkzeug.security import check_password_hash, generate_password_hash
@@ -808,7 +809,7 @@ def change_quantity_in_group():
 
 
 @app.get('/')
-@login_required
+@h.login_required
 def index():
 
     error = None
