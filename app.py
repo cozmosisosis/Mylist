@@ -1,7 +1,7 @@
 import os, logging, sqlite3
 from datetime import datetime
 import helpers
-from helpers import get_db, close_db, get_item_by_name_for_user, get_item_by_id_for_user, create_item_for_user, add_item_to_active_list, get_active_item_with_null_group, update_active_item_with_null_group_quantity, get_users_groups, get_users_items, get_users_active_items, get_single_user_active_item, update_active_item_quantity, add_item_to_active_list_from_group
+from helpers import close_db, get_item_by_name_for_user, get_item_by_id_for_user, create_item_for_user, add_item_to_active_list, get_active_item_with_null_group, update_active_item_with_null_group_quantity, get_users_groups, get_users_items, get_users_active_items, get_single_user_active_item, update_active_item_quantity, add_item_to_active_list_from_group
 from flask import Flask, flash, jsonify, render_template, redirect, session, request, url_for
 from werkzeug.security import check_password_hash, generate_password_hash
 
@@ -18,7 +18,7 @@ app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'
 @helpers.login_required
 def old_index():
 
-    db = get_db()
+    db = helpers.get_db()
 
     if 'user_id' in session:
         error = None
@@ -86,7 +86,7 @@ def active_list_add_item():
 @helpers.login_required
 def old_add_from_group():
 
-    db = get_db()
+    db = helpers.get_db()
 
     if request.method == 'GET':
         close_db()
@@ -194,7 +194,7 @@ def old_add_from_group_verification():
         flash('Error with group id')
         return redirect(url_for('edit_groups'))
 
-    db = get_db()
+    db = helpers.get_db()
     
     valid_group = db.execute("SELECT * FROM groups WHERE user_id = ? AND groups_id = ?", (session['user_id'], group_id)).fetchone()
     if not valid_group:
@@ -218,7 +218,7 @@ def old_add_from_group_verification():
 def add_from_group_verification():
 
     error = None
-    db = get_db()
+    db = helpers.get_db()
 
     group_id = request.form.get('group_id')
     if not group_id:
@@ -257,7 +257,7 @@ def add_from_group_verification():
 @helpers.login_required
 def remove_from_active_list():
 
-    db = get_db()
+    db = helpers.get_db()
 
     if request.method == 'GET':
         flash('Invalid route')
@@ -292,7 +292,7 @@ def remove_from_active_list():
 @helpers.login_required
 def old_change_quantity_on_active_list():
 
-    db = get_db()
+    db = helpers.get_db()
     if request.method == 'GET':
         return redirect(url_for('index'))
     
@@ -328,7 +328,7 @@ def old_change_quantity_on_active_list():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
 
-    db = get_db()
+    db = helpers.get_db()
 
     if request.method == 'GET':
 
@@ -396,7 +396,7 @@ def logout():
 @app.route("/register", methods=['POST', 'GET'])
 def register():
 
-    db = get_db()
+    db = helpers.get_db()
     if request.method == 'GET':
         try:
             if session['user_id'] is not None:
@@ -453,7 +453,7 @@ def register():
 @helpers.login_required
 def account():
 
-    db = get_db()
+    db = helpers.get_db()
     if 'user_id' in session:
         error = None
         user = db.execute('SELECT user_id, username, user_email, date_created, date_last_active FROM users WHERE user_id = ?', (session['user_id'],))
@@ -477,7 +477,7 @@ def account():
 @helpers.login_required
 def my_groups_old():
 
-    db = get_db()
+    db = helpers.get_db()
     if request.method == 'GET':
         groups = db.execute("SELECT * FROM groups WHERE user_id = ? ORDER BY groups_name", (session['user_id'],))
         groups = list(groups)
@@ -510,7 +510,7 @@ def my_groups_old():
 @helpers.login_required
 def remove_group():
 
-    db = get_db()
+    db = helpers.get_db()
     if request.method == 'GET':
         close_db()
         return redirect(url_for('my_groups'))
@@ -532,7 +532,7 @@ def remove_group():
 @helpers.login_required
 def change_group_name():
 
-    db = get_db()
+    db = helpers.get_db()
     if request.method == 'GET':
         flash('invalid method')
         close_db()
@@ -569,7 +569,7 @@ def change_group_name():
 @helpers.login_required
 def edit_groups():
 
-    db = get_db()
+    db = helpers.get_db()
     if request.method == 'GET':
 
         groups = list(db.execute("SELECT * FROM groups WHERE user_id = ? ORDER BY groups_name", (session['user_id'],)))
@@ -588,7 +588,7 @@ def edit_groups():
 def add_to_group():
 
     app.logger.error("old add to group route")
-    db = get_db()
+    db = helpers.get_db()
     if request.method == 'GET':
         close_db()
         return redirect(url_for('edit_groups'))
@@ -643,7 +643,7 @@ def add_to_group():
 @helpers.login_required
 def remove_from_group():
 
-    db = get_db()
+    db = helpers.get_db()
 
     item_to_remove = request.form['item_id']
     group_removing_from = request.form['groups_id']
@@ -669,7 +669,7 @@ def remove_from_group():
 @helpers.login_required
 def delete_account():
 
-    db = get_db()
+    db = helpers.get_db()
     if request.method == 'GET':
         close_db()
         return render_template('delete_account.html')
@@ -719,7 +719,7 @@ def edit_account():
 @helpers.login_required
 def edit_account_route(info_to_edit):
 
-    db = get_db()
+    db = helpers.get_db()
     valid_routes = ['username', 'password', 'email']
 
     if info_to_edit not in valid_routes:
@@ -783,7 +783,7 @@ def edit_account_route(info_to_edit):
 @helpers.login_required
 def change_quantity_in_group():
 
-    db = get_db()
+    db = helpers.get_db()
     groups_items_id = request.form.get('id')
     value = request.form.get('value')
 
@@ -813,7 +813,7 @@ def change_quantity_in_group():
 def index():
 
     error = None
-    db = get_db()
+    db = helpers.get_db()
     user = db.execute('SELECT * FROM users WHERE user_id = ?', (session['user_id'],)).fetchone()
 
     if not user:
@@ -833,7 +833,7 @@ def index():
 @helpers.login_required
 def active_list_data():
 
-    db = get_db()
+    db = helpers.get_db()
     users_groups = list(db.execute("SELECT * FROM groups WHERE user_id = ?", (session['user_id'],)))
     users_items = list(db.execute("SELECT * FROM item WHERE user_id = ? ORDER BY item_name", (session['user_id'],)))
     user_active_items = list(db.execute("SELECT * FROM user_active_items JOIN item ON user_active_items.item_id = item.item_id WHERE user_active_items.user_id = ? ORDER BY item.item_name", (session['user_id'],)))
@@ -846,7 +846,7 @@ def active_list_data():
 @helpers.login_required
 def active_list():
 
-    db = get_db()
+    db = helpers.get_db()
     user_active_items_id = request.form.get('id')
     value = request.form.get('value')
     if not value or not user_active_items_id or type(int(value)) is not int or not int(user_active_items_id):
@@ -887,7 +887,7 @@ def my_items():
 @helpers.login_required
 def my_items_data():
 
-    db = get_db()
+    db = helpers.get_db()
     item = list(db.execute("SELECT * FROM item WHERE user_id = ? ORDER BY item_name", (session['user_id'],)))
     close_db()
     return jsonify(render_template('/ajax_templates/ajax_my_items.html', item=item))
@@ -899,7 +899,7 @@ def my_items_data():
 def create_item():
 
     error = None
-    db = get_db()
+    db = helpers.get_db()
     new_item_name = request.form.get('item_name').strip()
     if not new_item_name:
         error = 'Cannot create an item with no name, please try again.'
@@ -927,7 +927,7 @@ def create_item():
 def change_item_name():
 
     error = None
-    db = get_db()
+    db = helpers.get_db()
     item_id = request.form.get('item_id')
     item_new_name = request.form.get('item_new_name').strip()
 
@@ -966,7 +966,7 @@ def change_item_name():
 def delete_item():
 
     error = None
-    db = get_db()
+    db = helpers.get_db()
     item_to_delete = request.form.get('item_id')
     if not item_to_delete:
         error = 'Error no item found in submition'
@@ -1004,7 +1004,7 @@ def my_groups():
 @helpers.login_required
 def my_groups_data():
 
-    db = get_db()
+    db = helpers.get_db()
     groups = list(db.execute("SELECT * FROM groups WHERE user_id = ? ORDER BY groups_name", (session['user_id'],)))
     group_items = list(db.execute("SELECT groups_items.groups_id, item.item_id, item.item_name, groups_items.quantity, item.user_id, groups_items.groups_items_id FROM item JOIN groups_items ON groups_items.item_id = item.item_id WHERE item.user_id = ? ORDER BY item_name", (session['user_id'],)))
     users_items = list(db.execute("SELECT * FROM item WHERE user_id = ? ORDER BY item_name", (session['user_id'],)))
@@ -1018,7 +1018,7 @@ def my_groups_data():
 def create_group():
 
     error = None
-    db = get_db()
+    db = helpers.get_db()
     new_group_name = request.form.get('new_group_name').strip()
 
     if not new_group_name:
@@ -1048,7 +1048,7 @@ def create_group():
 def delete_group():
 
     error = None
-    db = get_db()
+    db = helpers.get_db()
     group_to_delete = request.form.get('group_to_delete')
     if not group_to_delete:
         error = 'Error with group selected, no value found'
@@ -1078,7 +1078,7 @@ def add_item_to_group():
 
     app.logger.error("new add item to group")
     error = None
-    db = get_db()
+    db = helpers.get_db()
     
     selected_group = request.form.get('groups')
     submitted_item = request.form.get('item_to_add')
