@@ -1,7 +1,7 @@
 import os, logging, sqlite3
 from datetime import datetime
 import helpers
-from helpers import close_db, get_item_by_name_for_user, get_item_by_id_for_user, create_item_for_user, add_item_to_active_list, get_active_item_with_null_group, update_active_item_with_null_group_quantity, get_users_groups, get_users_items, get_users_active_items, get_single_user_active_item, update_active_item_quantity, add_item_to_active_list_from_group
+from helpers import get_item_by_name_for_user, get_item_by_id_for_user, create_item_for_user, add_item_to_active_list, get_active_item_with_null_group, update_active_item_with_null_group_quantity, get_users_groups, get_users_items, get_users_active_items, get_single_user_active_item, update_active_item_quantity, add_item_to_active_list_from_group
 from flask import Flask, flash, jsonify, render_template, redirect, session, request, url_for
 from werkzeug.security import check_password_hash, generate_password_hash
 
@@ -27,7 +27,7 @@ def old_index():
         if not user:
             error = "Failure retreving user account info please try logging on again"
             flash(error)
-            close_db()
+            helpers.close_db()
             return redirect(url_for('login'))
         users_groups = list(db.execute("SELECT * FROM groups WHERE user_id = ?", (session['user_id'],)))
         users_items = list(db.execute("SELECT * FROM item WHERE user_id = ? ORDER BY item_name", (session['user_id'],)))
@@ -35,12 +35,12 @@ def old_index():
         
         db.execute('UPDATE users SET date_last_active = ? WHERE user_id = ?', (datetime.utcnow(), session['user_id']))
         db.commit()
-        close_db()
+        helpers.close_db()
         return render_template("old_index.html", users_items=users_items, user_active_items=user_active_items, users_groups=users_groups)
 
     error = 'login failure, user_id not found in session'
     flash(error)
-    close_db()
+    helpers.close_db()
     return redirect(url_for('login'))
 
 # OLD INDEX NOT IN USE END
@@ -89,7 +89,7 @@ def old_add_from_group():
     db = helpers.get_db()
 
     if request.method == 'GET':
-        close_db()
+        helpers.close_db()
         return redirect(url_for('edit_groups'))
     
     items = request.form
@@ -99,11 +99,11 @@ def old_add_from_group():
             valid_item = db.execute("SELECT * FROM item WHERE user_id = ? AND item_id = ?", (session['user_id'], key,)).fetchone()
             if not valid_item:
                 flash('Invalid Item in submission')
-                close_db()
+                helpers.close_db()
                 return redirect(url_for('edit_groups'))
             if int(items[key]) < 0:
                 flash('Invalid quantity in submission. Quantity can not be less than 0')
-                close_db()
+                helpers.close_db()
                 return redirect(url_for('edit_groups'))
         else:
             groups_id = items[key]
@@ -124,7 +124,7 @@ def old_add_from_group():
                     db.commit()
 
             
-    close_db()
+    helpers.close_db()
     flash('items added')
     return redirect(url_for('index'))
 
@@ -199,10 +199,10 @@ def old_add_from_group_verification():
     valid_group = db.execute("SELECT * FROM groups WHERE user_id = ? AND groups_id = ?", (session['user_id'], group_id)).fetchone()
     if not valid_group:
         flash('Invalid Group')
-        close_db()
+        helpers.close_db()
         return redirect(url_for('edit_groups'))
     groups_items = list(db.execute("SELECT * FROM groups_items JOIN item ON groups_items.item_id = item.item_id WHERE groups_id = ?", (group_id,)))
-    close_db()
+    helpers.close_db()
     app.logger.error(len(groups_items))
 
     if len(groups_items) == 0:
@@ -238,12 +238,12 @@ def add_from_group_verification():
         users_groups = list(db.execute("SELECT * FROM groups WHERE user_id = ?", (session['user_id'],)))
         users_items = list(db.execute("SELECT * FROM item WHERE user_id = ? ORDER BY item_name", (session['user_id'],)))
         user_active_items = list(db.execute("SELECT * FROM user_active_items JOIN item ON user_active_items.item_id = item.item_id WHERE user_active_items.user_id = ? ORDER BY item.item_name", (session['user_id'],)))
-        close_db()
+        helpers.close_db()
         app.logger.error('error found')
         return jsonify(render_template('/ajax_templates/ajax_index.html', users_groups=users_groups, users_items=users_items, user_active_items=user_active_items, error=error))
 
     group_name = db.execute("SELECT groups_name FROM groups WHERE groups_id = ?", (group_id,)).fetchone()
-    close_db()
+    helpers.close_db()
     return jsonify(render_template('/ajax_templates/ajax_group_items_verification.html', groups_items=groups_items, group_name=group_name))
 
 
@@ -261,24 +261,24 @@ def remove_from_active_list():
 
     if request.method == 'GET':
         flash('Invalid route')
-        close_db()
+        helpers.close_db()
         return redirect(url_for('index'))
     
     active_item_removing = request.form['user_active_items_id']
     app.logger.error(active_item_removing)
     if not active_item_removing:
         flash('Error removing item, please try again')
-        close_db()
+        helpers.close_db()
         return redirect(url_for('index'))
     
     valid_active_item = db.execute("SELECT * FROM user_active_items WHERE user_id = ? AND user_active_items_id = ?", (session['user_id'], active_item_removing)).fetchone()
     if not valid_active_item:
         flash('Invalid item to remove please try again')
-        close_db()
+        helpers.close_db()
         return redirect(url_for('index'))
     db.execute("DELETE FROM user_active_items WHERE user_id = ? AND user_active_items_id = ?", (session['user_id'], active_item_removing,))
     db.commit()
-    close_db()
+    helpers.close_db()
 
     return redirect(url_for('index'))
 
@@ -307,18 +307,18 @@ def old_change_quantity_on_active_list():
     valid_item = db.execute("SELECT * FROM user_active_items WHERE user_id = ? AND item_id = ?", (session['user_id'], item_id,)).fetchone()
     if not valid_item:
         flash('Error invalid item')
-        close_db()
+        helpers.close_db()
         return redirect(url_for('index'))
     
     if new_quantity_int == 0:
         db.execute("DELETE FROM user_active_items WHERE user_id = ? AND item_id = ?", (session['user_id'], item_id,))
         db.commit()
-        close_db()
+        helpers.close_db()
         flash('Item quantity set to 0, Item removed')
         return redirect(url_for('index'))
     db.execute("UPDATE user_active_items SET active_items_quantity = ? WHERE user_id = ? AND item_id = ?", (new_quantity_int, session['user_id'], item_id,))
     db.commit()
-    close_db()
+    helpers.close_db()
     flash('quantity updated')
     return redirect(url_for('index'))
 
@@ -337,15 +337,15 @@ def login():
             session_user_id_valid = db.execute("SELECT * FROM users WHERE user_id = ?", (session['user_id'],)).fetchone()
             if session_user_id_valid is None:
                 session.clear()
-                close_db()
+                helpers.close_db()
                 return render_template('login.html')
             flash('Logged in!')
             db.execute('UPDATE users SET date_last_active = ? WHERE user_id = ?', (datetime.utcnow(), session['user_id']))
             db.commit()
-            close_db()
+            helpers.close_db()
             return redirect(url_for('index'))
         else:
-            close_db()
+            helpers.close_db()
             return render_template('login.html')
 
 
@@ -371,13 +371,13 @@ def login():
             try:
                 db.execute('UPDATE users SET date_last_active = ? WHERE user_id = ?', (datetime.utcnow(), user['user_id']))
                 db.commit()
-                close_db()
+                helpers.close_db()
                 return redirect(url_for('index'))
             except:
                 error = 'Failed to update date last active in account info'
 
         flash(error)
-        close_db()
+        helpers.close_db()
         return redirect(url_for('login'))
 
 
@@ -401,10 +401,10 @@ def register():
         try:
             if session['user_id'] is not None:
                 flash('Must not be logged in to register')
-                close_db()
+                helpers.close_db()
                 return redirect(url_for('index'))
         except: pass
-        close_db()
+        helpers.close_db()
         return render_template('register.html')
     if request.method == 'POST':
         username = request.form['username']
@@ -438,13 +438,13 @@ def register():
                 if not user_email:
                     flash('Please update email for account recovery.')
                 flash('Account created, Please Login!')
-                close_db()
+                helpers.close_db()
                 return redirect(url_for('login'))
 
 
         flash(error)
 
-        close_db()
+        helpers.close_db()
         return redirect(url_for('register'))
 
 
@@ -461,12 +461,12 @@ def account():
         if user is None:
             error = "Failure retreving user account info please try logging on again"
             flash(error)
-            close_db()
+            helpers.close_db()
             return redirect(url_for('login'))
 
         db.execute('UPDATE users SET date_last_active = ? WHERE user_id = ?', (datetime.utcnow(), session['user_id']))
         db.commit()
-        close_db()
+        helpers.close_db()
         return render_template("account.html", user=user)
 
 
@@ -481,27 +481,27 @@ def my_groups_old():
     if request.method == 'GET':
         groups = db.execute("SELECT * FROM groups WHERE user_id = ? ORDER BY groups_name", (session['user_id'],))
         groups = list(groups)
-        close_db()
+        helpers.close_db()
         return render_template('my_groups.html', groups=groups)
     new_group = request.form['group_name'].strip()
     
     if not new_group:
         flash('Group Name Not Filled out!')
-        close_db()
+        helpers.close_db()
         return redirect(url_for('my_groups_old'))
     
     group = db.execute("SELECT * FROM groups WHERE groups_name = ? AND user_id = ?", (new_group, session['user_id'],)).fetchone()
 
     if group is not None:
         flash('Group already exists')
-        close_db()
+        helpers.close_db()
         return redirect(url_for('my_groups_old'))
 
     db.execute("INSERT INTO groups (user_id, groups_name) VALUES (?,?)", (session['user_id'], new_group))  
     db.commit()
 
     flash('Group Added')
-    close_db()
+    helpers.close_db()
     return redirect(url_for('my_groups_old'))
 
 
@@ -512,18 +512,18 @@ def remove_group():
 
     db = helpers.get_db()
     if request.method == 'GET':
-        close_db()
+        helpers.close_db()
         return redirect(url_for('my_groups'))
     group_deleting = request.form['groups_id']
     valid_group = db.execute("SELECT * FROM groups WHERE groups_id = ? AND user_id = ?", (group_deleting, session['user_id'],)).fetchone()
     if not valid_group:
         flash('Error with trying to delete group')
-        close_db()
+        helpers.close_db()
         return redirect(url_for('my_groups'))
     
     db.execute("DELETE FROM groups WHERE groups_id = ? AND user_id = ?", (group_deleting, session['user_id']))
     db.commit()
-    close_db()
+    helpers.close_db()
     return redirect(url_for('my_groups'))
 
 
@@ -535,7 +535,7 @@ def change_group_name():
     db = helpers.get_db()
     if request.method == 'GET':
         flash('invalid method')
-        close_db()
+        helpers.close_db()
         return redirect(url_for('my_groups'))
     
     groups_id = request.form.get('groups_id_for_name_change')
@@ -543,23 +543,23 @@ def change_group_name():
 
     if not groups_id or not groups_new_name:
         flash('Must select and fill out all of form before submitting')
-        close_db()
+        helpers.close_db()
         return redirect(url_for('my_groups'))
 
     valid_group = db.execute("SELECT * FROM groups WHERE groups_id = ? AND user_id = ?", (groups_id, session['user_id'],)).fetchone()
     if not valid_group:
         flash('Error Invalid submission')
-        close_db()
+        helpers.close_db()
         return redirect(url_for('my_groups'))
 
     if valid_group['groups_name'] == groups_new_name:
         flash('New name is the same as old')
-        close_db()
+        helpers.close_db()
         return redirect(url_for('my_groups'))
 
     db.execute("UPDATE groups SET groups_name = ? WHERE groups_id = ? AND user_id = ?", (groups_new_name, groups_id, session['user_id'],))
     db.commit()
-    close_db()
+    helpers.close_db()
     flash('changed group name')
     return redirect(url_for('my_groups'))
 
@@ -576,9 +576,9 @@ def edit_groups():
         group_items = list(db.execute("SELECT groups_items.groups_id, item.item_id, item.item_name, groups_items.quantity, item.user_id FROM item JOIN groups_items ON groups_items.item_id = item.item_id WHERE item.user_id = ? ORDER BY item_name", (session['user_id'],)))
         users_items = list(db.execute("SELECT * FROM item WHERE user_id = ? ORDER BY item_name", (session['user_id'],)))
 
-        close_db()
+        helpers.close_db()
         return render_template('edit_groups.html', groups=groups, group_items=group_items, users_items=users_items)
-    close_db()
+    helpers.close_db()
     return redirect(url_for('edit_groups'))
 
 
@@ -590,7 +590,7 @@ def add_to_group():
     app.logger.error("old add to group route")
     db = helpers.get_db()
     if request.method == 'GET':
-        close_db()
+        helpers.close_db()
         return redirect(url_for('edit_groups'))
     
     selected_group = request.form.get('groups')
@@ -600,13 +600,13 @@ def add_to_group():
 
     if not selected_group or not selected_item or not inputed_quantity:
         flash('Must select group, item to add and a valid quantity (greater than 0)')
-        close_db()
+        helpers.close_db()
         return redirect(url_for('edit_groups'))
     
     inputed_quantity = int(inputed_quantity)
     if inputed_quantity <= 0:
         flash('Must input a valid quantity (greater than 0)')
-        close_db()
+        helpers.close_db()
         return redirect(url_for('edit_groups'))
 
 
@@ -615,7 +615,7 @@ def add_to_group():
     
     if users_item is None or users_group is None:
         flash('Error occured with either item submitted or group submitted to. No link to user')
-        close_db()
+        helpers.close_db()
         return redirect(url_for('edit_groups'))
     
     ingredient_is_in_groups_items = db.execute("SELECT * FROM groups_items WHERE groups_id = ? AND item_id = ?", (selected_group, selected_item,)).fetchone()
@@ -623,14 +623,14 @@ def add_to_group():
     if not ingredient_is_in_groups_items:
         db.execute("INSERT INTO groups_items (groups_id, item_id, quantity) VALUES (?, ?, ?)", (selected_group, selected_item, inputed_quantity))
         db.commit()
-        close_db()
+        helpers.close_db()
         return redirect(url_for('edit_groups'))
 
     old_quantity = ingredient_is_in_groups_items['quantity']
     new_quantity = inputed_quantity + old_quantity
     db.execute("UPDATE groups_items SET quantity = ? WHERE groups_id = ? AND item_id = ?", (new_quantity, selected_group, selected_item,))
     db.commit()
-    close_db()
+    helpers.close_db()
     return redirect(url_for('edit_groups'))
 
 
@@ -652,14 +652,14 @@ def remove_from_group():
     valid_group = db.execute("SELECT * FROM groups WHERE groups_id = ? and user_id = ?", (group_removing_from, session['user_id'],)).fetchone()
     if not valid_item or not valid_group:
         flash('not valid item or group')
-        close_db()
+        helpers.close_db()
         return redirect(url_for('edit_groups'))
 
     app.logger.error(item_to_remove)
     app.logger.error(group_removing_from)
     db.execute("DELETE FROM groups_items WHERE groups_id = ? AND item_id = ?", (group_removing_from, item_to_remove,))
     db.commit()
-    close_db()
+    helpers.close_db()
     flash('item removed from group')
     return redirect(url_for('edit_groups'))
 
@@ -671,7 +671,7 @@ def delete_account():
 
     db = helpers.get_db()
     if request.method == 'GET':
-        close_db()
+        helpers.close_db()
         return render_template('delete_account.html')
     
     username = request.form['username']
@@ -679,7 +679,7 @@ def delete_account():
 
     if not username or not password:
         flash('Must fill out both username and password to DELETE account')
-        close_db()
+        helpers.close_db()
         return redirect(url_for('delete_account'))
     
     user = db.execute('SELECT * FROM users WHERE user_id = ?', (session['user_id'],)).fetchone()
@@ -687,7 +687,7 @@ def delete_account():
 
     if user is None or username != user['username'] or not check_password_hash(user['hashed_password'], password):
         flash('Error with submitted User Info for deletion. Please log out, log back in, and then try deleting account again.')
-        close_db()
+        helpers.close_db()
         return redirect(url_for('delete_account'))
 
 
@@ -695,7 +695,7 @@ def delete_account():
     db.execute("DELETE FROM users WHERE user_id = ?", (session['user_id'],))
 
     db.commit()
-    close_db()
+    helpers.close_db()
 
     session.clear()
     flash("Account Deleted")
@@ -745,28 +745,28 @@ def edit_account_route(info_to_edit):
 
         if current_username != user['username'] or not check_password_hash(user['hashed_password'], current_password) or session['user_id'] != user['user_id']:
             flash('Account not verified, please try again')
-            close_db()
+            helpers.close_db()
             return redirect(f'/edit_account/{info_to_edit}')
 
 
         if value_edditing == 'username':
             if user['username'] == new_value:
                 flash('Inputed new username is the same as old username')
-                close_db()
+                helpers.close_db()
                 return redirect(f'/edit_account/{info_to_edit}')
             db.execute("UPDATE users SET username = ? WHERE user_id = ?", (new_value, session['user_id'],))
         elif value_edditing == 'password':
             value_edditing = 'hashed_password'
             if check_password_hash(user['hashed_password'], new_value):
                 flash('Inputed new password is the same as old password')
-                close_db()
+                helpers.close_db()
                 return redirect(f'/edit_account/{info_to_edit}')
             db.execute("UPDATE users SET hashed_password = ? WHERE user_id = ?", ( generate_password_hash(new_value), session['user_id'],))
         elif value_edditing == 'email':
             value_edditing = 'user_email'
             if user['user_email'] == new_value:
                 flash('Inputed new email is the same as old email')
-                close_db()
+                helpers.close_db()
                 return redirect(f'/edit_account/{info_to_edit}')
             try:
                 db.execute("UPDATE users SET user_email = ? WHERE user_id = ?", (new_value, session['user_id'],))
@@ -774,7 +774,7 @@ def edit_account_route(info_to_edit):
                 flash('Unable to add email, email already associated with an account')
 
         db.commit()
-        close_db()
+        helpers.close_db()
         return redirect(url_for('account'))
 
 
@@ -790,20 +790,20 @@ def change_quantity_in_group():
     valid_groups_item = db.execute("SELECT * FROM groups_items JOIN groups ON groups_items.groups_id = groups.groups_id WHERE groups.user_id = ? AND groups_items.groups_items_id = ?", (session['user_id'], groups_items_id)).fetchone()
     if not valid_groups_item:
         app.logger.error(groups_items_id)
-        close_db()
+        helpers.close_db()
         return redirect(url_for('my_groups_data'))
 
     value = int(value)
     if value > 0:
         db.execute("UPDATE groups_items SET quantity = ? WHERE groups_items_id = ?", (value, groups_items_id,))
         db.commit()
-        close_db()
+        helpers.close_db()
         return redirect(url_for('my_groups_data'))
 
     else:
         db.execute("DELETE FROM groups_items WHERE groups_items_id = ?", (groups_items_id,))
         db.commit()
-        close_db()
+        helpers.close_db()
         return redirect(url_for('my_groups_data'))
 
 
@@ -819,12 +819,12 @@ def index():
     if not user:
         error = "Failure retreving user account info please try logging on again"
         flash(error)
-        close_db()
+        helpers.close_db()
         return redirect(url_for('login'))
     
     db.execute('UPDATE users SET date_last_active = ? WHERE user_id = ?', (datetime.utcnow(), session['user_id']))
     db.commit()
-    close_db()
+    helpers.close_db()
     return render_template("/index.html")
 
 
@@ -837,7 +837,7 @@ def active_list_data():
     users_groups = list(db.execute("SELECT * FROM groups WHERE user_id = ?", (session['user_id'],)))
     users_items = list(db.execute("SELECT * FROM item WHERE user_id = ? ORDER BY item_name", (session['user_id'],)))
     user_active_items = list(db.execute("SELECT * FROM user_active_items JOIN item ON user_active_items.item_id = item.item_id WHERE user_active_items.user_id = ? ORDER BY item.item_name", (session['user_id'],)))
-    close_db()
+    helpers.close_db()
     return jsonify(render_template('/ajax_templates/ajax_index.html', users_groups=users_groups, users_items=users_items, user_active_items=user_active_items))
      
 
@@ -889,7 +889,7 @@ def my_items_data():
 
     db = helpers.get_db()
     item = list(db.execute("SELECT * FROM item WHERE user_id = ? ORDER BY item_name", (session['user_id'],)))
-    close_db()
+    helpers.close_db()
     return jsonify(render_template('/ajax_templates/ajax_my_items.html', item=item))
 
 
@@ -912,12 +912,12 @@ def create_item():
     if error:
         item = db.execute("SELECT * FROM item WHERE user_id = ? ORDER BY item_name", (session['user_id'],))
         item = list(item)
-        close_db()
+        helpers.close_db()
         return jsonify(render_template('/ajax_templates/ajax_my_items.html', item=item, error=error))
 
     db.execute("INSERT INTO item (user_id, item_name) VALUES (?, ?)", (session['user_id'], new_item_name, ))
     db.commit()
-    close_db()
+    helpers.close_db()
     return redirect(url_for('my_items_data'))
 
 
@@ -951,7 +951,7 @@ def change_item_name():
     if error:
         item = db.execute("SELECT * FROM item WHERE user_id = ? ORDER BY item_name", (session['user_id'],))
         item = list(item)
-        close_db()
+        helpers.close_db()
         return jsonify(render_template('/ajax_templates/ajax_my_items.html', item=item, error=error))
 
 
@@ -980,7 +980,7 @@ def delete_item():
     if error:
         item = db.execute("SELECT * FROM item WHERE user_id = ? ORDER BY item_name", (session['user_id'],))
         item = list(item)
-        close_db()
+        helpers.close_db()
         return jsonify(render_template('/ajax_templates/ajax_my_items.html', item=item, error=error))
     
     db.execute("DELETE FROM item WHERE user_id = ? AND item_id = ?", (session['user_id'], item_to_delete))
@@ -1008,7 +1008,7 @@ def my_groups_data():
     groups = list(db.execute("SELECT * FROM groups WHERE user_id = ? ORDER BY groups_name", (session['user_id'],)))
     group_items = list(db.execute("SELECT groups_items.groups_id, item.item_id, item.item_name, groups_items.quantity, item.user_id, groups_items.groups_items_id FROM item JOIN groups_items ON groups_items.item_id = item.item_id WHERE item.user_id = ? ORDER BY item_name", (session['user_id'],)))
     users_items = list(db.execute("SELECT * FROM item WHERE user_id = ? ORDER BY item_name", (session['user_id'],)))
-    close_db()
+    helpers.close_db()
     return jsonify(render_template("/ajax_templates/ajax_my_groups.html", groups=groups, group_items=group_items, users_items=users_items))
 
 
@@ -1032,13 +1032,13 @@ def create_group():
     if not error:    
         db.execute("INSERT INTO groups (user_Id, groups_name) VALUES (?, ?)", (session['user_id'], new_group_name))
         db.commit()
-        close_db()
+        helpers.close_db()
         return redirect(url_for('my_groups_data')) 
     
     groups = list(db.execute("SELECT * FROM groups WHERE user_id = ? ORDER BY groups_name", (session['user_id'],)))
     group_items = list(db.execute("SELECT groups_items.groups_id, item.item_id, item.item_name, groups_items.quantity, item.user_id FROM item JOIN groups_items ON groups_items.item_id = item.item_id WHERE item.user_id = ? ORDER BY item_name", (session['user_id'],)))
     users_items = list(db.execute("SELECT * FROM item WHERE user_id = ? ORDER BY item_name", (session['user_id'],)))
-    close_db()
+    helpers.close_db()
     return jsonify(render_template("/ajax_templates/ajax_my_groups.html", groups=groups, group_items=group_items, users_items=users_items, error=error))
 
 
@@ -1061,13 +1061,13 @@ def delete_group():
     if not error:
         db.execute("DELETE FROM groups WHERE user_id = ? AND groups_id = ?", (session['user_id'], group_to_delete))
         db.commit()
-        close_db()
+        helpers.close_db()
         return redirect(url_for('my_groups_data'))
 
     groups = list(db.execute("SELECT * FROM groups WHERE user_id = ? ORDER BY groups_name", (session['user_id'],)))
     group_items = list(db.execute("SELECT groups_items.groups_id, item.item_id, item.item_name, groups_items.quantity, item.user_id FROM item JOIN groups_items ON groups_items.item_id = item.item_id WHERE item.user_id = ? ORDER BY item_name", (session['user_id'],)))
     users_items = list(db.execute("SELECT * FROM item WHERE user_id = ? ORDER BY item_name", (session['user_id'],)))
-    close_db()
+    helpers.close_db()
     return jsonify(render_template("/ajax_templates/ajax_my_groups.html", groups=groups, group_items=group_items, users_items=users_items, error=error))
 
 
@@ -1108,14 +1108,14 @@ def add_item_to_group():
             new_item = db.execute("SELECT * FROM item WHERE item_name = ? COLLATE NOCASE and user_id = ?", (submitted_item, session['user_id'],)).fetchone()
             db.execute('INSERT INTO groups_items (groups_id, item_id, quantity) VALUES (?, ?, ?)', (selected_group, new_item['item_id'], inputed_quantity))
             db.commit()
-            close_db()
+            helpers.close_db()
             return redirect(url_for('my_groups_data'))
         else:
             item_in_group = db.execute("SELECT * FROM groups_items WHERE groups_id = ? AND item_id = ?", (selected_group, existing_item['item_id'],)).fetchone()
             if not item_in_group:
                 db.execute("INSERT INTO groups_items (groups_id, item_id, quantity) VALUES (?, ?, ?)", (selected_group, existing_item['item_id'], inputed_quantity))
                 db.commit()
-                close_db()
+                helpers.close_db()
                 return redirect(url_for('my_groups_data'))
             else:
                 error = 'Item is in groups already, to change quantity or remove from group, use the quantity input by the item in the group you would like to change'
@@ -1125,7 +1125,7 @@ def add_item_to_group():
     groups = list(db.execute("SELECT * FROM groups WHERE user_id = ? ORDER BY groups_name", (session['user_id'],)))
     group_items = list(db.execute("SELECT groups_items.groups_id, item.item_id, item.item_name, groups_items.quantity, item.user_id FROM item JOIN groups_items ON groups_items.item_id = item.item_id WHERE item.user_id = ? ORDER BY item_name", (session['user_id'],)))
     users_items = list(db.execute("SELECT * FROM item WHERE user_id = ? ORDER BY item_name", (session['user_id'],)))
-    close_db()
+    helpers.close_db()
     return jsonify(render_template("/ajax_templates/ajax_my_groups.html", groups=groups, group_items=group_items, users_items=users_items, error=error))
     
 
