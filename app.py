@@ -1,7 +1,7 @@
 import os, logging, sqlite3
 from datetime import datetime
-import helpers as h
-from helpers import login_required, get_db, close_db, get_item_by_name_for_user, get_item_by_id_for_user, create_item_for_user, add_item_to_active_list, get_active_item_with_null_group, update_active_item_with_null_group_quantity, get_users_groups, get_users_items, get_users_active_items, get_single_user_active_item, update_active_item_quantity, add_item_to_active_list_from_group
+import helpers
+from helpers import get_db, close_db, get_item_by_name_for_user, get_item_by_id_for_user, create_item_for_user, add_item_to_active_list, get_active_item_with_null_group, update_active_item_with_null_group_quantity, get_users_groups, get_users_items, get_users_active_items, get_single_user_active_item, update_active_item_quantity, add_item_to_active_list_from_group
 from flask import Flask, flash, jsonify, render_template, redirect, session, request, url_for
 from werkzeug.security import check_password_hash, generate_password_hash
 
@@ -15,7 +15,7 @@ app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'
 # OLD INDEX NOT IN USE
 
 @app.route('/old_index')
-@login_required
+@helpers.login_required
 def old_index():
 
     db = get_db()
@@ -50,7 +50,7 @@ def old_index():
 
 
 @app.post("/active_list_add_item")
-@login_required
+@helpers.login_required
 def active_list_add_item():
 
     item_to_add = request.form.get('item_to_add').strip()
@@ -83,7 +83,7 @@ def active_list_add_item():
 # Changing group add
 
 @app.route('/old_add_from_group', methods=['POST', 'GET'])
-@login_required
+@helpers.login_required
 def old_add_from_group():
 
     db = get_db()
@@ -130,7 +130,7 @@ def old_add_from_group():
 
 
 @app.post('/add_from_group')
-@login_required
+@helpers.login_required
 def add_from_group():
     
     error = None
@@ -183,7 +183,7 @@ def add_from_group():
 
 # Changing group verification
 @app.route('/old_add_from_group_verification', methods=['POST', 'GET'])
-@login_required
+@helpers.login_required
 def old_add_from_group_verification():
 
     if request.method == 'GET':
@@ -214,7 +214,7 @@ def old_add_from_group_verification():
 
 
 @app.post('/add_from_group_verification')
-@login_required
+@helpers.login_required
 def add_from_group_verification():
 
     error = None
@@ -254,7 +254,7 @@ def add_from_group_verification():
 # OLD ROUTE NO LONGER IN USE
 
 @app.route('/remove_from_active_list', methods=['GET', 'POST'])
-@login_required
+@helpers.login_required
 def remove_from_active_list():
 
     db = get_db()
@@ -289,7 +289,7 @@ def remove_from_active_list():
 # OLD CHANGE QUANTITY ON ACTIVE LIST NOT IN USE 
 
 @app.route('/old_change_quantity_on_active_list', methods=['GET', 'POST'])
-@login_required
+@helpers.login_required
 def old_change_quantity_on_active_list():
 
     db = get_db()
@@ -450,7 +450,7 @@ def register():
 
 
 @app.route("/account", methods=['GET', 'POST'])
-@login_required
+@helpers.login_required
 def account():
 
     db = get_db()
@@ -474,7 +474,7 @@ def account():
 
 
 @app.route("/my_groups_old", methods=['GET', 'POST'])
-@login_required
+@helpers.login_required
 def my_groups_old():
 
     db = get_db()
@@ -507,7 +507,7 @@ def my_groups_old():
 
 
 @app.route("/remove_group", methods=['GET', 'POST'])
-@login_required
+@helpers.login_required
 def remove_group():
 
     db = get_db()
@@ -529,7 +529,7 @@ def remove_group():
 
 
 @app.route("/change_group_name", methods=['GET', 'POST'])
-@login_required
+@helpers.login_required
 def change_group_name():
 
     db = get_db()
@@ -566,7 +566,7 @@ def change_group_name():
 
 
 @app.route("/edit_groups", methods=['GET', 'POST'])
-@login_required
+@helpers.login_required
 def edit_groups():
 
     db = get_db()
@@ -584,7 +584,7 @@ def edit_groups():
 
 
 @app.route("/add_to_group", methods=['POST', 'GET'])
-@login_required
+@helpers.login_required
 def add_to_group():
 
     app.logger.error("old add to group route")
@@ -640,7 +640,7 @@ def add_to_group():
 
 
 @app.route("/remove_from_group", methods=['POST', 'GET'])
-@login_required
+@helpers.login_required
 def remove_from_group():
 
     db = get_db()
@@ -666,7 +666,7 @@ def remove_from_group():
 
 
 @app.route("/delete_account", methods=['GET', 'POST'])
-@login_required
+@helpers.login_required
 def delete_account():
 
     db = get_db()
@@ -704,7 +704,7 @@ def delete_account():
 
 
 @app.route("/edit_account", methods=['POST', 'GET'])
-@login_required
+@helpers.login_required
 def edit_account():
     
     if request.method == 'GET':
@@ -716,7 +716,7 @@ def edit_account():
 
 
 @app.route("/edit_account/<info_to_edit>", methods=['POST', 'GET'])
-@login_required
+@helpers.login_required
 def edit_account_route(info_to_edit):
 
     db = get_db()
@@ -780,7 +780,7 @@ def edit_account_route(info_to_edit):
 
 
 @app.post("/change_quantity_in_group")
-@login_required
+@helpers.login_required
 def change_quantity_in_group():
 
     db = get_db()
@@ -809,7 +809,7 @@ def change_quantity_in_group():
 
 
 @app.get('/')
-@h.login_required
+@helpers.login_required
 def index():
 
     error = None
@@ -830,7 +830,7 @@ def index():
 
 
 @app.get("/active_list_data")
-@login_required
+@helpers.login_required
 def active_list_data():
 
     db = get_db()
@@ -843,7 +843,7 @@ def active_list_data():
 
 
 @app.post('/active_list_quantity')
-@login_required
+@helpers.login_required
 def active_list():
 
     db = get_db()
@@ -876,7 +876,7 @@ def active_list():
 # BEST TECHNIQUE SO FAR
     
 @app.get("/my_items")
-@login_required
+@helpers.login_required
 def my_items():
 
     return render_template('my_items.html')
@@ -884,7 +884,7 @@ def my_items():
 
 
 @app.get("/my_items_data")
-@login_required
+@helpers.login_required
 def my_items_data():
 
     db = get_db()
@@ -895,7 +895,7 @@ def my_items_data():
 
 
 @app.post("/create_item")
-@login_required
+@helpers.login_required
 def create_item():
 
     error = None
@@ -923,7 +923,7 @@ def create_item():
 
 
 @app.post("/change_item_name")
-@login_required
+@helpers.login_required
 def change_item_name():
 
     error = None
@@ -962,7 +962,7 @@ def change_item_name():
 
 
 @app.post("/delete_item")
-@login_required
+@helpers.login_required
 def delete_item():
 
     error = None
@@ -993,7 +993,7 @@ def delete_item():
 
 
 @app.get("/my_groups")
-@login_required
+@helpers.login_required
 def my_groups():
     
     return render_template("/my_groups.html")
@@ -1001,7 +1001,7 @@ def my_groups():
 
 
 @app.get("/my_groups_data")
-@login_required
+@helpers.login_required
 def my_groups_data():
 
     db = get_db()
@@ -1014,7 +1014,7 @@ def my_groups_data():
 
 
 @app.post("/create_group")
-@login_required
+@helpers.login_required
 def create_group():
 
     error = None
@@ -1044,7 +1044,7 @@ def create_group():
 
 
 @app.post("/delete_group")
-@login_required
+@helpers.login_required
 def delete_group():
 
     error = None
@@ -1073,7 +1073,7 @@ def delete_group():
 
 
 @app.post("/add_item_to_group")
-@login_required
+@helpers.login_required
 def add_item_to_group():
 
     app.logger.error("new add item to group")
