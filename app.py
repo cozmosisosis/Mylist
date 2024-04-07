@@ -3,7 +3,7 @@ from datetime import datetime
 from flask import Flask, flash, jsonify, render_template, redirect, session, request, url_for
 from werkzeug.security import check_password_hash, generate_password_hash
 import helpers
-from helpers import get_item_by_name_for_user, get_item_by_id_for_user, create_item_for_user, add_item_to_active_list, get_active_item_with_null_group, update_active_item_with_null_group_quantity, get_users_groups, get_users_items, get_users_active_items, get_single_user_active_item, update_active_item_quantity, add_item_to_active_list_from_group
+from helpers import get_item_by_id_for_user, create_item_for_user, add_item_to_active_list, get_active_item_with_null_group, update_active_item_with_null_group_quantity, get_users_groups, get_users_items, get_users_active_items, get_single_user_active_item, update_active_item_quantity, add_item_to_active_list_from_group
 
 app = Flask(__name__)
 
@@ -59,12 +59,12 @@ def active_list_add_item():
     if not item_to_add or not quantity_to_add or quantity_to_add_int < 1:
         return redirect(url_for('active_list_data'))
 
-    valid_item = get_item_by_name_for_user(item_to_add, session['user_id'])
+    valid_item = helpers.get_item_by_name_for_user(item_to_add, session['user_id'])
 
     if not valid_item:
 
         create_item_for_user(item_to_add, session['user_id'])
-        new_item = get_item_by_name_for_user(item_to_add, session['user_id'])
+        new_item = helpers.get_item_by_name_for_user(item_to_add, session['user_id'])
         add_item_to_active_list(new_item['item_id'], session['user_id'], quantity_to_add_int)
         return redirect(url_for('active_list_data'))
 
