@@ -11,6 +11,9 @@
 
             <label for="item_to_add">Add an item to your list:</label>
             <input list="item" id="item_to_add" name="item_to_add" autocomplete="off" autofocus/>
+            <script>
+                document.getElementById('item_to_add').select();
+            </script>
             
             <datalist id="item" name="item">
                 {% for row in users_items %}
