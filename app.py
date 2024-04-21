@@ -3,7 +3,7 @@ from datetime import datetime
 from flask import Flask, flash, jsonify, render_template, redirect, session, request, url_for
 from werkzeug.security import check_password_hash, generate_password_hash
 import helpers
-from helpers import get_users_groups, get_users_items, get_users_active_items, get_single_user_active_item, update_active_item_quantity, add_item_to_active_list_from_group
+from helpers import get_users_items, get_users_active_items, get_single_user_active_item, update_active_item_quantity, add_item_to_active_list_from_group
 
 app = Flask(__name__)
 
@@ -156,7 +156,7 @@ def add_from_group():
 
 
     if error:
-        users_groups = get_users_groups(session['user_id'])
+        users_groups = helpers.get_users_groups(session['user_id'])
         users_items = get_users_items(session['user_id'])
         user_active_items = get_users_active_items(session['user_id'])
         return jsonify(render_template('/ajax_templates/ajax_index.html', users_groups=users_groups, users_items=users_items, user_active_items=user_active_items, error=error))
