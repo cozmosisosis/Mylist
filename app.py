@@ -3,7 +3,7 @@ from datetime import datetime
 from flask import Flask, flash, jsonify, render_template, redirect, session, request, url_for
 from werkzeug.security import check_password_hash, generate_password_hash
 import helpers
-from helpers import update_active_item_with_null_group_quantity, get_users_groups, get_users_items, get_users_active_items, get_single_user_active_item, update_active_item_quantity, add_item_to_active_list_from_group
+from helpers import get_users_groups, get_users_items, get_users_active_items, get_single_user_active_item, update_active_item_quantity, add_item_to_active_list_from_group
 
 app = Flask(__name__)
 
@@ -71,7 +71,7 @@ def active_list_add_item():
     item_on_list = helpers.get_active_item_with_null_group(valid_item['item_id'], session['user_id'])
     if item_on_list:
         new_quantity = item_on_list['active_items_quantity'] + quantity_to_add_int
-        update_active_item_with_null_group_quantity(valid_item['item_id'], session['user_id'], new_quantity)
+        helpers.update_active_item_with_null_group_quantity(valid_item['item_id'], session['user_id'], new_quantity)
         return redirect(url_for('active_list_data'))
 
     helpers.add_item_to_active_list(valid_item['item_id'], session['user_id'], quantity_to_add_int)
