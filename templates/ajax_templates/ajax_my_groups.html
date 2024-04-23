@@ -14,8 +14,10 @@
                 </th>
             </tr>
             <tr>
-                <td><input type="text" placeholder="New Group" autocomplete="off" name="new_group_name" autofocus>
-                </td>
+                <td><input type="text" placeholder="New Group" autocomplete="off" name="new_group_name" id="new_group_name"></td>
+                <script>
+                    document.getElementById('new_group_name').select();
+                </script>
                 <td>
                     <input type="submit" value="Add">
                 </td>

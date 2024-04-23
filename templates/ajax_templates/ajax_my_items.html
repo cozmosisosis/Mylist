@@ -16,7 +16,10 @@
                     </th>
                 </tr>
                 <tr>
-                    <td><input type="text" placeholder="Name" autocomplete="off" name="item_name" autofocus></td>
+                    <td><input type="text" placeholder="Name" autocomplete="off" name="item_name" id="item_name"></td>
+                    <script>
+                        document.getElementById('item_name').select();
+                    </script>
                     <td>
                         <input type="submit" value="Add">
                     </td>
