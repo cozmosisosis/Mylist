@@ -173,7 +173,7 @@ def add_from_group():
                     helpers.update_active_item_quantity(new_quantity, session['user_id'], key, groups_id)
 
 
-    return redirect(url_for('index'))
+    return redirect(url_for('active_list_data'))
 
 # Changing group add end
 

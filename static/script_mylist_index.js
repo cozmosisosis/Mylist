@@ -6,7 +6,7 @@ $(document).ready(function() {
         dataType: 'json',
         type: 'GET',
         success: function (response) {
-            $('#index_data').replaceWith(response);
+            $('#primary_data').replaceWith(response);
         },
         error: function (response) {
             alert('Server side error with input');
@@ -32,7 +32,7 @@ function change_quantity(id) {
             value: value
         },
         success: function (response) {
-            $('#index_data').replaceWith(response)
+            $('#primary_data').replaceWith(response)
         },
         error: function () {
             console.log('error')
@@ -43,7 +43,6 @@ function change_quantity(id) {
 
 $(document).on("submit", "form", function(e) {
     
-    console.log('test')
     var form = $(this);
     var formId = form.attr("id");
     e.preventDefault();
@@ -54,7 +53,7 @@ $(document).on("submit", "form", function(e) {
         type: 'POST',
         data: form.serialize(),
         success: function(response) {
-            $('#index_data').replaceWith(response);
+            $('#primary_data').replaceWith(response);
         },
         error: function(response) {
             location.reload();
