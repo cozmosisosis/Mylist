@@ -7,7 +7,7 @@ $(document).ready(function() {
         dataType: 'json',
         type: 'GET',
         success: function(response) {
-            $('#my_groups_data').replaceWith(response);
+            $('#primary_data').replaceWith(response);
         },
         error: function(response) {
             location.reload();
@@ -27,7 +27,7 @@ $(document).on("submit", "form", function(e) {
         type: 'POST',
         data: form.serialize(),
         success: function(response) {
-            $('#my_groups_data').replaceWith(response);
+            $('#primary_data').replaceWith(response);
         },
         error: function(response) {
             location.reload();
@@ -50,7 +50,7 @@ function update_quantity(id) {
             value: value
         },
         success: function (response) {
-            $('#my_groups_data').replaceWith(response);
+            $('#primary_data').replaceWith(response);
             console.log('updating quantitypp')
         },
         error:  function (response) {
