@@ -7,7 +7,7 @@ $(document).ready(function() {
         dataType: 'json',
         type: 'GET',
         success: function (response) {
-            $('#my_items_table').replaceWith(response);
+            $('#primary_data').replaceWith(response);
 
         },
         error: function (response) {
@@ -29,7 +29,7 @@ $(document).on("submit", "form", function(e) {
         type: 'POST',
         data: form.serialize(),
         success: function(response) {
-            $('#my_items_table').replaceWith(response);
+            $('#primary_data').replaceWith(response);
         },
         error: function(response) {
             location.reload();
