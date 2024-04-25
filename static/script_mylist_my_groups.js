@@ -27,7 +27,13 @@ $(document).on("submit", "form", function(e) {
         type: 'POST',
         data: form.serialize(),
         success: function(response) {
-            $('#primary_data').replaceWith(response);
+
+            if (formId == 'add_from_group') {
+                location.replace(window.location.origin)
+            }
+            else {
+                $('#primary_data').replaceWith(response);
+            }
         },
         error: function(response) {
             location.reload();
