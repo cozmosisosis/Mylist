@@ -11,42 +11,6 @@ app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'
 
 
 
-# OLD INDEX NOT IN USE
-
-@app.route('/old_index')
-@helpers.login_required
-def old_index():
-
-    db = helpers.get_db()
-
-    if 'user_id' in session:
-        error = None
-        user = db.execute('SELECT * FROM users WHERE user_id = ?', (session['user_id'],)).fetchone()
-
-        if not user:
-            error = "Failure retreving user account info please try logging on again"
-            flash(error)
-            helpers.close_db()
-            return redirect(url_for('login'))
-        users_groups = list(db.execute("SELECT * FROM groups WHERE user_id = ?", (session['user_id'],)))
-        users_items = list(db.execute("SELECT * FROM item WHERE user_id = ? ORDER BY item_name", (session['user_id'],)))
-        user_active_items = list(db.execute("SELECT * FROM user_active_items JOIN item ON user_active_items.item_id = item.item_id WHERE user_active_items.user_id = ? ORDER BY item.item_name", (session['user_id'],)))
-
-        db.execute('UPDATE users SET date_last_active = ? WHERE user_id = ?', (datetime.utcnow(), session['user_id']))
-        db.commit()
-        helpers.close_db()
-        return render_template("old_index.html", users_items=users_items, user_active_items=user_active_items, users_groups=users_groups)
-
-    error = 'login failure, user_id not found in session'
-    flash(error)
-    helpers.close_db()
-    return redirect(url_for('login'))
-
-# OLD INDEX NOT IN USE END
-
-
-
-
 
 @app.post("/active_list_add_item")
 @helpers.login_required
@@ -76,56 +40,6 @@ def active_list_add_item():
     helpers.add_item_to_active_list(valid_item['item_id'], session['user_id'], quantity_to_add_int)
     return redirect(url_for('active_list_data'))
 
-
-
-
-# Changing group add
-
-@app.route('/old_add_from_group', methods=['POST', 'GET'])
-@helpers.login_required
-def old_add_from_group():
-
-    db = helpers.get_db()
-
-    if request.method == 'GET':
-        helpers.close_db()
-        return redirect(url_for('edit_groups'))
-
-    items = request.form
-    for key in items:
-        if key != 'groups_id':
-
-            valid_item = db.execute("SELECT * FROM item WHERE user_id = ? AND item_id = ?", (session['user_id'], key,)).fetchone()
-            if not valid_item:
-                flash('Invalid Item in submission')
-                helpers.close_db()
-                return redirect(url_for('edit_groups'))
-            if int(items[key]) < 0:
-                flash('Invalid quantity in submission. Quantity can not be less than 0')
-                helpers.close_db()
-                return redirect(url_for('edit_groups'))
-        else:
-            groups_id = items[key]
-
-
-    for key in items:
-        if key != 'groups_id':
-
-            item_in_list = db.execute("SELECT * FROM user_active_items WHERE user_id = ? AND item_id = ? AND groups_id = ?", (session['user_id'], key, groups_id)).fetchone()
-
-            if int(items[key]) != 0:
-                if not item_in_list:
-                    db.execute("INSERT INTO user_active_items (user_id, item_id, groups_id, active_items_quantity) VALUES (?, ?, ?, ?)", (session['user_id'], key, groups_id, int(items[key])))
-                    db.commit()
-                else:
-                    new_quantity = int(items[key]) + item_in_list['active_items_quantity']
-                    db.execute("UPDATE user_active_items SET active_items_quantity = ? WHERE user_id = ? AND item_id = ? AND groups_id = ?", (new_quantity, session['user_id'], key, groups_id))
-                    db.commit()
-
-
-    helpers.close_db()
-    flash('items added')
-    return redirect(url_for('index'))
 
 
 @app.post('/add_from_group')
@@ -175,40 +89,6 @@ def add_from_group():
 
     return redirect(url_for('active_list_data'))
 
-# Changing group add end
-
-
-
-# Changing group verification
-@app.route('/old_add_from_group_verification', methods=['POST', 'GET'])
-@helpers.login_required
-def old_add_from_group_verification():
-
-    if request.method == 'GET':
-        return redirect(url_for('edit_groups'))
-    group_id = request.form.get('group_id')
-
-    if not group_id:
-        flash('Error with group id')
-        return redirect(url_for('edit_groups'))
-
-    db = helpers.get_db()
-
-    valid_group = db.execute("SELECT * FROM groups WHERE user_id = ? AND groups_id = ?", (session['user_id'], group_id)).fetchone()
-    if not valid_group:
-        flash('Invalid Group')
-        helpers.close_db()
-        return redirect(url_for('edit_groups'))
-    groups_items = list(db.execute("SELECT * FROM groups_items JOIN item ON groups_items.item_id = item.item_id WHERE groups_id = ?", (group_id,)))
-    helpers.close_db()
-    app.logger.error(len(groups_items))
-
-    if len(groups_items) == 0:
-        app.logger.error('Locating')
-        flash('Group has no items')
-        return redirect(url_for('edit_groups'))
-
-    return render_template('add_from_group_verification.html', groups_items=groups_items)
 
 
 @app.post('/add_from_group_verification')
@@ -244,83 +124,6 @@ def add_from_group_verification():
     helpers.close_db()
     return jsonify(render_template('/ajax_templates/ajax_group_items_verification.html', groups_items=groups_items, group_name=group_name))
 
-
-# Changing group verification end
-
-
-
-# OLD ROUTE NO LONGER IN USE
-
-@app.route('/remove_from_active_list', methods=['GET', 'POST'])
-@helpers.login_required
-def remove_from_active_list():
-
-    db = helpers.get_db()
-
-    if request.method == 'GET':
-        flash('Invalid route')
-        helpers.close_db()
-        return redirect(url_for('index'))
-
-    active_item_removing = request.form['user_active_items_id']
-    app.logger.error(active_item_removing)
-    if not active_item_removing:
-        flash('Error removing item, please try again')
-        helpers.close_db()
-        return redirect(url_for('index'))
-
-    valid_active_item = db.execute("SELECT * FROM user_active_items WHERE user_id = ? AND user_active_items_id = ?", (session['user_id'], active_item_removing)).fetchone()
-    if not valid_active_item:
-        flash('Invalid item to remove please try again')
-        helpers.close_db()
-        return redirect(url_for('index'))
-    db.execute("DELETE FROM user_active_items WHERE user_id = ? AND user_active_items_id = ?", (session['user_id'], active_item_removing,))
-    db.commit()
-    helpers.close_db()
-
-    return redirect(url_for('index'))
-
-# OLD ROUTE NO LONGER IN USE END
-
-
-
-# OLD CHANGE QUANTITY ON ACTIVE LIST NOT IN USE 
-
-@app.route('/old_change_quantity_on_active_list', methods=['GET', 'POST'])
-@helpers.login_required
-def old_change_quantity_on_active_list():
-
-    db = helpers.get_db()
-    if request.method == 'GET':
-        return redirect(url_for('index'))
-
-    item_id = request.form['item_id']
-    new_quantity = request.form['new_quantity']
-    new_quantity_int = int(new_quantity)
-
-    if not item_id or not new_quantity or new_quantity_int < 0:
-        flash('Invalid input')
-        return redirect(url_for('index'))
-
-    valid_item = db.execute("SELECT * FROM user_active_items WHERE user_id = ? AND item_id = ?", (session['user_id'], item_id,)).fetchone()
-    if not valid_item:
-        flash('Error invalid item')
-        helpers.close_db()
-        return redirect(url_for('index'))
-
-    if new_quantity_int == 0:
-        db.execute("DELETE FROM user_active_items WHERE user_id = ? AND item_id = ?", (session['user_id'], item_id,))
-        db.commit()
-        helpers.close_db()
-        flash('Item quantity set to 0, Item removed')
-        return redirect(url_for('index'))
-    db.execute("UPDATE user_active_items SET active_items_quantity = ? WHERE user_id = ? AND item_id = ?", (new_quantity_int, session['user_id'], item_id,))
-    db.commit()
-    helpers.close_db()
-    flash('quantity updated')
-    return redirect(url_for('index'))
-
-# OLD CHANGE QUANTITY ON ACTIVE LIST NOT IN USE END
 
 
 @app.route('/login', methods=['GET', 'POST'])
