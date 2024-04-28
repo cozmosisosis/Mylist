@@ -272,62 +272,7 @@ def account():
 
 
 
-
-
-@app.route("/my_groups_old", methods=['GET', 'POST'])
-@helpers.login_required
-def my_groups_old():
-
-    db = helpers.get_db()
-    if request.method == 'GET':
-        groups = db.execute("SELECT * FROM groups WHERE user_id = ? ORDER BY groups_name", (session['user_id'],))
-        groups = list(groups)
-        helpers.close_db()
-        return render_template('my_groups.html', groups=groups)
-    new_group = request.form['group_name'].strip()
-
-    if not new_group:
-        flash('Group Name Not Filled out!')
-        helpers.close_db()
-        return redirect(url_for('my_groups_old'))
-
-    group = db.execute("SELECT * FROM groups WHERE groups_name = ? AND user_id = ?", (new_group, session['user_id'],)).fetchone()
-
-    if group is not None:
-        flash('Group already exists')
-        helpers.close_db()
-        return redirect(url_for('my_groups_old'))
-
-    db.execute("INSERT INTO groups (user_id, groups_name) VALUES (?,?)", (session['user_id'], new_group))  
-    db.commit()
-
-    flash('Group Added')
-    helpers.close_db()
-    return redirect(url_for('my_groups_old'))
-
-
-
-@app.route("/remove_group", methods=['GET', 'POST'])
-@helpers.login_required
-def remove_group():
-
-    db = helpers.get_db()
-    if request.method == 'GET':
-        helpers.close_db()
-        return redirect(url_for('my_groups'))
-    group_deleting = request.form['groups_id']
-    valid_group = db.execute("SELECT * FROM groups WHERE groups_id = ? AND user_id = ?", (group_deleting, session['user_id'],)).fetchone()
-    if not valid_group:
-        flash('Error with trying to delete group')
-        helpers.close_db()
-        return redirect(url_for('my_groups'))
-    
-    db.execute("DELETE FROM groups WHERE groups_id = ? AND user_id = ?", (group_deleting, session['user_id']))
-    db.commit()
-    helpers.close_db()
-    return redirect(url_for('my_groups'))
-
-
+# Not in use, needs to be reimplemented
 
 @app.route("/change_group_name", methods=['GET', 'POST'])
 @helpers.login_required
@@ -364,105 +309,7 @@ def change_group_name():
     flash('changed group name')
     return redirect(url_for('my_groups'))
 
-
-
-@app.route("/edit_groups", methods=['GET', 'POST'])
-@helpers.login_required
-def edit_groups():
-
-    db = helpers.get_db()
-    if request.method == 'GET':
-
-        groups = list(db.execute("SELECT * FROM groups WHERE user_id = ? ORDER BY groups_name", (session['user_id'],)))
-        group_items = list(db.execute("SELECT groups_items.groups_id, item.item_id, item.item_name, groups_items.quantity, item.user_id FROM item JOIN groups_items ON groups_items.item_id = item.item_id WHERE item.user_id = ? ORDER BY item_name", (session['user_id'],)))
-        users_items = list(db.execute("SELECT * FROM item WHERE user_id = ? ORDER BY item_name", (session['user_id'],)))
-
-        helpers.close_db()
-        return render_template('edit_groups.html', groups=groups, group_items=group_items, users_items=users_items)
-    helpers.close_db()
-    return redirect(url_for('edit_groups'))
-
-
-
-@app.route("/add_to_group", methods=['POST', 'GET'])
-@helpers.login_required
-def add_to_group():
-
-    app.logger.error("old add to group route")
-    db = helpers.get_db()
-    if request.method == 'GET':
-        helpers.close_db()
-        return redirect(url_for('edit_groups'))
-
-    selected_group = request.form.get('groups')
-    selected_item = request.form.get('items')
-    inputed_quantity = request.form.get('quantity')
-
-
-    if not selected_group or not selected_item or not inputed_quantity:
-        flash('Must select group, item to add and a valid quantity (greater than 0)')
-        helpers.close_db()
-        return redirect(url_for('edit_groups'))
-
-    inputed_quantity = int(inputed_quantity)
-    if inputed_quantity <= 0:
-        flash('Must input a valid quantity (greater than 0)')
-        helpers.close_db()
-        return redirect(url_for('edit_groups'))
-
-
-    users_item = db.execute("SELECT * FROM item WHERE item_id = ? and user_id = ?", (selected_item, session['user_id'],)).fetchone()
-    users_group = db.execute("SELECT * FROM groups WHERE groups_id = ? and user_id = ?", (selected_group, session['user_id'],)).fetchone()
-
-    if users_item is None or users_group is None:
-        flash('Error occured with either item submitted or group submitted to. No link to user')
-        helpers.close_db()
-        return redirect(url_for('edit_groups'))
-    
-    ingredient_is_in_groups_items = db.execute("SELECT * FROM groups_items WHERE groups_id = ? AND item_id = ?", (selected_group, selected_item,)).fetchone()
-
-    if not ingredient_is_in_groups_items:
-        db.execute("INSERT INTO groups_items (groups_id, item_id, quantity) VALUES (?, ?, ?)", (selected_group, selected_item, inputed_quantity))
-        db.commit()
-        helpers.close_db()
-        return redirect(url_for('edit_groups'))
-
-    old_quantity = ingredient_is_in_groups_items['quantity']
-    new_quantity = inputed_quantity + old_quantity
-    db.execute("UPDATE groups_items SET quantity = ? WHERE groups_id = ? AND item_id = ?", (new_quantity, selected_group, selected_item,))
-    db.commit()
-    helpers.close_db()
-    return redirect(url_for('edit_groups'))
-
-
-
-
-
-
-
-@app.route("/remove_from_group", methods=['POST', 'GET'])
-@helpers.login_required
-def remove_from_group():
-
-    db = helpers.get_db()
-
-    item_to_remove = request.form['item_id']
-    group_removing_from = request.form['groups_id']
-
-    valid_item = db.execute("SELECT * FROM item WHERE item_id = ? AND user_id = ?", (item_to_remove, session['user_id'],)).fetchone()
-    valid_group = db.execute("SELECT * FROM groups WHERE groups_id = ? and user_id = ?", (group_removing_from, session['user_id'],)).fetchone()
-    if not valid_item or not valid_group:
-        flash('not valid item or group')
-        helpers.close_db()
-        return redirect(url_for('edit_groups'))
-
-    app.logger.error(item_to_remove)
-    app.logger.error(group_removing_from)
-    db.execute("DELETE FROM groups_items WHERE groups_id = ? AND item_id = ?", (group_removing_from, item_to_remove,))
-    db.commit()
-    helpers.close_db()
-    flash('item removed from group')
-    return redirect(url_for('edit_groups'))
+# Not in use, needs to be reimplemented end
 
 
 
@@ -877,7 +724,6 @@ def delete_group():
 @helpers.login_required
 def add_item_to_group():
 
-    app.logger.error("new add item to group")
     error = None
     db = helpers.get_db()
 
