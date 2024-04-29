@@ -46,7 +46,7 @@
 
 
 <h5><p>
-	All previous items are saved into a db allowing you to check for any items you may have forgotten to add
+	All previously added items are saved in the db ( unless you want to delete them )
 </p></h5>
 	<ul><h6>
 	<li>
