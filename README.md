@@ -1,7 +1,6 @@
-<div>
-	<h1>MyList</h1>
+<h1>MyList</h1>
 
-<h5>Save time and don't forget <b><i>ANYTHING</i></b> when you use MyList</h5>
+<h5>You can save time and avoid forgeting <b><i>ANYTHING</i></b> when you use MyList</h5>
 
 <br>
 <br>
@@ -15,34 +14,66 @@
 	<li>Grocery lists</li>
 	<li>List of Chores</li>
 	<li>Ingredients for a recepie</li>
-	<li>Any list that you have made or used more than once</li>
 </h6></ul>
 
 <br>
 <br>
 
-<h3>How Is It Useful Compared To Other List Apps?</h3>
+<h3>Primary Functions</h3>
+<hr>
+
+
+<h5><p>
+	Quickly create a list of items with custom names and quantities
+</p></h5>
+	<ul><h6>
+	<li>
+		Enter the name and quantity of the item you want on the list. It is that easy.
+	</li>
+	</h6></ul>	
+
+
+<h5><p>
+	Group items together with specified quantities under a group name that can be quickly added to the list
+</p></h5>
+	<ul><h6>
+	<li>
+		If you make pizza often you can make a pizza group. Add all the ingredients you need to make pizza to the group and it is ready for use. Next time you plan to go
+		grocery shopping and you decide you want pizza, all you need to do is select the pizza group to add to list and then verify all items on the list before adding. 
+		This allows you to avoid adding ingredients that you may already have enough of.
+	</li>
+	</h6></ul>
+
+
+<h5><p>
+	All previous items are saved into a db allowing you to check for any items you may have forgotten to add
+</p></h5>
+	<ul><h6>
+	<li>
+		With all previous items saved you can look back through all items you have added to check if there is anything you 
+		may have forgoten to add.
+	</li>
+	</h6></ul>
+
+
+<br>
+<br>
+<br>
+
+
+<h3>Is This App For You?</h3>
 <hr>
 
 <ul><h6>
   <li>Have you ever forgotten to write something on a grocery list that you new you needed but just didn't remember when you made the list?</li>
-	<br>
-  <li>Do you look up the ingredients for the same recipy over and over?</li>
-	<br>
+  <li>Do you look up the ingredients for the same recepy over and over?</li>
+  <li>Have you remade the same packing list every time you travel?</li>
+  <li>Or make the same todo lists every year for spring cleaning?</li>
 </h6></ul>
 
-<p>The tools this app offers allows all these issues to be avoided.</p>
+<p>If so, the tools this app offers allow all these issues to be avoided.</p>
+<br>
 
-<h5><p>
-	Primary Functions:
-</p></h5>
-
-<ul><h6>
-	<li>Account creation to save items and groups for the user. This makes the use of the application better over time as items and groups are compiled.</li>
-	<li>Quickly create a list of items with custom names and quantities</li>
-	<li>Group items together with specified quantities under a group name that can be quickly added to the list</li>
-	<li>With all Items being saved into a db, you can quickly look through all of the previously added items to ensure nothing is forgotten.</li>
-</h6></ul>
 
 
 <br>
@@ -50,12 +81,4 @@
 
  
  
-</p>
-<p>
- This DIR is for my application Mylist. This application is for simplifying and expiditing the process of making lists that you have made many times over. EX: grocery list, chores etc.
- The application remembers all items you add to your list and items can be grouped so as to be automically added when wanted. EX: For weekly chores everything could be added to the list
- just by selecting weekly chores (mow lawn, do laundry, take out the trash etc). For things like a recipe all ingredients could be added by selecting the recipe for example pizza (flour, tomato sauce
- , cheese, pepperoni etc).
-</p>
 
-</div>
