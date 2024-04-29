@@ -78,7 +78,79 @@
 
 <br>
 <br>
+<br>
+<br>
 
- 
- 
+<h3>How To Install And Run Locally</h3>
+<hr>
 
+<h5><p>
+	Ensure you have python3 installed
+</p></h5>
+<br>
+
+<h5><p>
+	Clone The Repository
+</p></h5>
+
+```git
+	git clone https://github.com/cozmosisosis/Mylist.git
+```
+<br>
+
+<h5><p>
+	Create a python venv
+	<br>
+	<br>
+	If linux/mac:
+</p></h5>
+
+```python
+	py -3 -m venv .venv
+```
+<br>
+<h5><p>
+	If windows:
+</p></h5>
+
+```python
+	python3 -m venv .venv
+```
+<br>
+
+<h5><p>
+	Activate venv:
+	<br>
+	<br>
+	If linux/mac:
+</p></h5>
+
+```python
+	. .venv/bin/activate
+```
+<br>
+<h5><p>
+	If windows:
+</p></h5>
+
+```python
+	. .venv/scripts/activate
+```
+
+<br>
+<h5><p>
+	Once venv is activated run:
+</p></h5>
+
+```python
+	pip install -r requirements.txt
+```
+
+<br>
+<h5><p>
+	Finnaly you can run the application locally:
+</p></h5>
+
+```python
+	flask run
+```
