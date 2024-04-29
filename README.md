@@ -34,7 +34,7 @@
 
 
 <h5><p>
-	Group items together with specified quantities under a group name that can be quickly added to the list
+	Quick add custom made recipes
 </p></h5>
 	<ul><h6>
 	<li>
