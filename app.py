@@ -103,20 +103,19 @@ def add_from_group_verification():
         error = 'No group id submitted'
 
     if not error:
-        valid_group = db.execute("SELECT * FROM groups WHERE user_id = ? AND groups_id = ?", (session['user_id'], group_id)).fetchone()
+        valid_group = helpers.get_group_by_id_for_user( group_id, session['user_id'])
         if not valid_group:
             error = 'Invalid group'
 
     if not error:
-        groups_items = list(db.execute("SELECT * FROM groups_items JOIN item ON groups_items.item_id = item.item_id WHERE groups_id = ?", (group_id,)))
+        groups_items = helpers.get_groups_items_by_group_id(group_id)
         if len(groups_items) == 0:
             error = 'Group is empty'
 
     if error:
-        users_groups = list(db.execute("SELECT * FROM groups WHERE user_id = ?", (session['user_id'],)))
-        users_items = list(db.execute("SELECT * FROM item WHERE user_id = ? ORDER BY item_name", (session['user_id'],)))
-        user_active_items = list(db.execute("SELECT * FROM user_active_items JOIN item ON user_active_items.item_id = item.item_id WHERE user_active_items.user_id = ? ORDER BY item.item_name", (session['user_id'],)))
-        helpers.close_db()
+        users_groups = helpers.get_users_groups(session['user_id'])
+        users_items = helpers.get_users_items(session['user_id'])
+        user_active_items = helpers.get_users_active_items(session['user_id'])
         app.logger.error('error found')
         return jsonify(render_template('/ajax_templates/ajax_index.html', users_groups=users_groups, users_items=users_items, user_active_items=user_active_items, error=error))
 

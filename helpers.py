@@ -144,3 +144,17 @@ def get_users_active_items(user_id):
     return users_active_items
 
 
+
+def get_group_by_id_for_user(group_id, user_id):
+    db = get_db()
+    group = db.execute('SELECT * FROM groups WHERE groups_id = ? AND user_id = ?', (group_id, user_id)).fetchone()
+    close_db()
+    return group
+
+
+
+def get_groups_items_by_group_id(group_id):
+    db = get_db()
+    items = list(db.execute('SELECT * FROM groups_items JOIN item ON groups_items.item_id = item.item_id WHERE groups_id = ?', (group_id,)))
+    close_db()
+    return items
