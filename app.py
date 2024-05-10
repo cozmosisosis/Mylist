@@ -96,7 +96,6 @@ def add_from_group():
 def add_from_group_verification():
 
     error = None
-    db = helpers.get_db()
 
     group_id = request.form.get('group_id')
     if not group_id:
@@ -119,8 +118,7 @@ def add_from_group_verification():
         app.logger.error('error found')
         return jsonify(render_template('/ajax_templates/ajax_index.html', users_groups=users_groups, users_items=users_items, user_active_items=user_active_items, error=error))
 
-    group_name = db.execute("SELECT groups_name FROM groups WHERE groups_id = ?", (group_id,)).fetchone()
-    helpers.close_db()
+    group_name = helpers.get_group_name_by_id(group_id)
     return jsonify(render_template('/ajax_templates/ajax_group_items_verification.html', groups_items=groups_items, group_name=group_name))
 
 
@@ -128,24 +126,20 @@ def add_from_group_verification():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
 
-    db = helpers.get_db()
 
     if request.method == 'GET':
 
         if 'user_id' in session:
 
-            session_user_id_valid = db.execute("SELECT * FROM users WHERE user_id = ?", (session['user_id'],)).fetchone()
+            session_user_id_valid = helpers.get_user_by_id(session['user_id'])
             if session_user_id_valid is None:
                 session.clear()
-                helpers.close_db()
                 return render_template('login.html')
             flash('Logged in!')
-            db.execute('UPDATE users SET date_last_active = ? WHERE user_id = ?', (datetime.utcnow(), session['user_id']))
-            db.commit()
-            helpers.close_db()
+
+            helpers.update_users_date_last_active(session['user_id'])
             return redirect(url_for('index'))
         else:
-            helpers.close_db()
             return render_template('login.html')
 
 
@@ -158,7 +152,7 @@ def login():
         if username == "" or password == "":
             error = 'Username and or Password was left empty'
 
-        user = db.execute('SELECT * FROM users WHERE username = ?', (username,)).fetchone()
+        user = helpers.get_user_by_username(username)
 
 
         if user is None or not check_password_hash(user['hashed_password'], password):
@@ -169,15 +163,12 @@ def login():
             session.clear()
             session['user_id'] = user['user_id']
             try:
-                db.execute('UPDATE users SET date_last_active = ? WHERE user_id = ?', (datetime.utcnow(), user['user_id']))
-                db.commit()
-                helpers.close_db()
+                helpers.update_users_date_last_active(user['user_id'])
                 return redirect(url_for('index'))
             except:
                 error = 'Failed to update date last active in account info'
 
         flash(error)
-        helpers.close_db()
         return redirect(url_for('login'))
 
 

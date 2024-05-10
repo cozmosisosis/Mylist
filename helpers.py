@@ -1,4 +1,5 @@
 import os, sqlite3, click
+from datetime import datetime
 from functools import wraps
 from flask import Flask, flash, render_template, redirect, session, request, url_for,current_app, g
 
@@ -158,3 +159,36 @@ def get_groups_items_by_group_id(group_id):
     items = list(db.execute('SELECT * FROM groups_items JOIN item ON groups_items.item_id = item.item_id WHERE groups_id = ?', (group_id,)))
     close_db()
     return items
+
+
+
+def get_group_name_by_id(group_id):
+    db = get_db()
+    group_name = db.execute('SELECT groups_name FROM groups WHERE groups_id = ?', (group_id,)).fetchone()
+    close_db()
+    return group_name
+
+
+
+def get_user_by_id(user_id):
+    db = get_db()
+    user = db.execute('SELECT * FROM users WHERE user_id = ?', (user_id,)).fetchone()
+    close_db()
+    return user
+
+
+
+def get_user_by_username(username):
+    db = get_db()
+    user = db.execute('SELECT * FROM users WHERE username = ?', (username,)).fetchone()
+    close_db()
+    return user
+
+
+
+def update_users_date_last_active(user_id):
+    db = get_db()
+    db.execute('UPDATE users SET date_last_active = ? WHERE user_id = ?', (datetime.utcnow(), user_id,))
+    db.commit()
+    close_db()
+    return True
