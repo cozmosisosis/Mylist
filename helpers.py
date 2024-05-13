@@ -186,9 +186,33 @@ def get_user_by_username(username):
 
 
 
+def get_user_by_email(user_email):
+    db = get_db()
+    user = db.execute('SELECT * FROM users WHERE user_email = ?', (user_email,)).fetchone()
+    close_db()
+    return user
+
+
+
 def update_users_date_last_active(user_id):
     db = get_db()
     db.execute('UPDATE users SET date_last_active = ? WHERE user_id = ?', (datetime.utcnow(), user_id,))
     db.commit()
     close_db()
     return True
+
+
+
+def create_user(username, hashed_password, user_email, date_time):
+    db = get_db()
+    try:
+        db.execute(
+            'INSERT INTO users (username, hashed_password, user_email, date_created, date_last_active) VALUES (?, ?, ?, ?, ?)', 
+            (username, hashed_password, user_email, date_time, date_time)
+                   )
+        db.commit()
+        close_db()
+        return True
+    except:
+        close_db()
+        return False

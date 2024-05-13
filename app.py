@@ -136,8 +136,6 @@ def login():
                 session.clear()
                 return render_template('login.html')
             flash('Logged in!')
-
-            helpers.update_users_date_last_active(session['user_id'])
             return redirect(url_for('index'))
         else:
             return render_template('login.html')
@@ -187,15 +185,12 @@ def logout():
 @app.route("/register", methods=['POST', 'GET'])
 def register():
 
-    db = helpers.get_db()
     if request.method == 'GET':
         try:
             if session['user_id'] is not None:
                 flash('Must not be logged in to register')
-                helpers.close_db()
                 return redirect(url_for('index'))
         except: pass
-        helpers.close_db()
         return render_template('register.html')
     if request.method == 'POST':
         username = request.form['username']
@@ -209,33 +204,25 @@ def register():
             error = 'Please fill out all required fields'
         elif not password == password_verification:
             error = 'Passwords do not match'
+        elif helpers.get_user_by_username(username):
+            error = 'Username already exists'
+        elif helpers.get_user_by_email(user_email):
+            error = 'Email already in use'
         elif not user_email:
             user_email = None
         elif not user_email == user_email_verification:
             error = 'Email and email verification do not match!'
 
 
-        if error is None: 
-            try:
-                db.execute(
-                    'INSERT INTO users (username, hashed_password, user_email, date_created, date_last_active) VALUES (?, ?, ?, ?, ?)',
-                    (username, generate_password_hash(password), user_email, datetime.utcnow(), datetime.utcnow())
-                )
-                db.commit()
-            except db.IntegrityError:
-                error = f"User {username} is already registered."
+        if error is None:
 
-            else:
-                if not user_email:
-                    flash('Please update email for account recovery.')
-                flash('Account created, Please Login!')
-                helpers.close_db()
-                return redirect(url_for('login'))
-
+            helpers.create_user(username, generate_password_hash(password), user_email, datetime.utcnow())
+            if not user_email:
+                flash('Please update email for account recovery.')
+            flash('Account created, Please Login!')
+            return redirect(url_for('login'))
 
         flash(error)
-
-        helpers.close_db()
         return redirect(url_for('register'))
 
 
