@@ -231,20 +231,16 @@ def register():
 @helpers.login_required
 def account():
 
-    db = helpers.get_db()
     if 'user_id' in session:
         error = None
-        user = db.execute('SELECT user_id, username, user_email, date_created, date_last_active FROM users WHERE user_id = ?', (session['user_id'],))
+        user = helpers.get_user_by_id(session['user_id'])
 
         if user is None:
             error = "Failure retreving user account info please try logging on again"
             flash(error)
-            helpers.close_db()
             return redirect(url_for('login'))
 
-        db.execute('UPDATE users SET date_last_active = ? WHERE user_id = ?', (datetime.utcnow(), session['user_id']))
-        db.commit()
-        helpers.close_db()
+        helpers.update_users_date_last_active(session['user_id'])
         return render_template("account.html", user=user)
 
 
@@ -255,10 +251,8 @@ def account():
 @helpers.login_required
 def change_group_name():
 
-    db = helpers.get_db()
     if request.method == 'GET':
         flash('invalid method')
-        helpers.close_db()
         return redirect(url_for('my_groups'))
 
     groups_id = request.form.get('groups_id_for_name_change')
@@ -266,23 +260,18 @@ def change_group_name():
 
     if not groups_id or not groups_new_name:
         flash('Must select and fill out all of form before submitting')
-        helpers.close_db()
         return redirect(url_for('my_groups'))
 
-    valid_group = db.execute("SELECT * FROM groups WHERE groups_id = ? AND user_id = ?", (groups_id, session['user_id'],)).fetchone()
+    valid_group = helpers.get_group_by_id_for_user(groups_id, session['user_id'])
     if not valid_group:
         flash('Error Invalid submission')
-        helpers.close_db()
         return redirect(url_for('my_groups'))
 
     if valid_group['groups_name'] == groups_new_name:
         flash('New name is the same as old')
-        helpers.close_db()
         return redirect(url_for('my_groups'))
 
-    db.execute("UPDATE groups SET groups_name = ? WHERE groups_id = ? AND user_id = ?", (groups_new_name, groups_id, session['user_id'],))
-    db.commit()
-    helpers.close_db()
+    helpers.update_groups_name(groups_new_name, groups_id, session['user_id'])
     flash('changed group name')
     return redirect(url_for('my_groups'))
 

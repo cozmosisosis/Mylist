@@ -216,3 +216,12 @@ def create_user(username, hashed_password, user_email, date_time):
     except:
         close_db()
         return False
+    
+
+
+def update_groups_name(new_name, groups_id, user_id):
+    db = get_db()
+    db.execute('UPDATE groups SET groups_name = ? WHERE groups_id = ? AND user_id = ?', (new_name, groups_id, user_id,))
+    db.commit()
+    close_db()
+    return

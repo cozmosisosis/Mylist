@@ -12,33 +12,31 @@ Account Info
 Account page
 
 <div>
-    {% for row in user %}
     <div>
-
+        
         <div>
-            <p>user id: {{ row['user_id'] }}</p>
+            <p>user id: {{ user['user_id'] }}</p>
         </div>
         <div>
-            <p>username: {{ row['username'] }}</p>
+            <p>username: {{ user['username'] }}</p>
         </div>
         <div>
             <p>password: *********</p>
         </div>
         <div>
-            <p>user email: {{ row['user_email'] }}</p>
+            <p>user email: {{ user['user_email'] }}</p>
         </div>
         <div>
-            <p>date created: {{ row['date_created'] }}</p>
+            <p>date created: {{ user['date_created'] }}</p>
         </div>
         <div>
-            <p>date last active: {{ row['date_last_active'] }}</p>
+            <p>date last active: {{ user['date_last_active'] }}</p>
         </div>
-
+        
         
         <a href="/edit_account">Edit Account</a>
         <a href="/delete_account">Delete Account</a>
     </div>
-    {% endfor %}
 </div>
 
 {% endblock %}
