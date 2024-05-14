@@ -296,7 +296,7 @@ def delete_account():
         helpers.close_db()
         return redirect(url_for('delete_account'))
 
-    user = db.execute('SELECT * FROM users WHERE user_id = ?', (session['user_id'],)).fetchone()
+    user = helpers.get_user_by_id(session['user_id'])
 
 
     if user is None or username != user['username'] or not check_password_hash(user['hashed_password'], password):
@@ -354,7 +354,8 @@ def edit_account_route(info_to_edit):
             flash('All Fields must be filled out')
             return redirect(f'/edit_account/{info_to_edit}')
 
-        user = db.execute("SELECT * FROM users WHERE user_id = ?", (session['user_id'],)).fetchone()
+        user = helpers.get_user_by_id(session['user_id'])
+
 
 
         if current_username != user['username'] or not check_password_hash(user['hashed_password'], current_password) or session['user_id'] != user['user_id']:
@@ -428,7 +429,7 @@ def index():
 
     error = None
     db = helpers.get_db()
-    user = db.execute('SELECT * FROM users WHERE user_id = ?', (session['user_id'],)).fetchone()
+    user = helpers.get_user_by_id(session['user_id'])
 
     if not user:
         error = "Failure retreving user account info please try logging on again"
@@ -447,11 +448,9 @@ def index():
 @helpers.login_required
 def active_list_data():
 
-    db = helpers.get_db()
-    users_groups = list(db.execute("SELECT * FROM groups WHERE user_id = ?", (session['user_id'],)))
-    users_items = list(db.execute("SELECT * FROM item WHERE user_id = ? ORDER BY item_name", (session['user_id'],)))
-    user_active_items = list(db.execute("SELECT * FROM user_active_items JOIN item ON user_active_items.item_id = item.item_id WHERE user_active_items.user_id = ? ORDER BY item.item_name", (session['user_id'],)))
-    helpers.close_db()
+    users_groups = helpers.get_users_groups(session['user_id'])
+    users_items = helpers.get_users_items(session['user_id'])
+    user_active_items = helpers.get_users_active_items(session['user_id'])
     return jsonify(render_template('/ajax_templates/ajax_index.html', users_groups=users_groups, users_items=users_items, user_active_items=user_active_items))
 
 
