@@ -122,7 +122,7 @@ def update_active_item_with_null_group_quantity(item_id, user_id, quantity):
 def get_users_groups(user_id):
 
     db = get_db()
-    groups = list(db.execute('SELECT * FROM groups WHERE user_id = ?', (user_id,)))
+    groups = list(db.execute('SELECT * FROM groups WHERE user_id = ? ORDER BY groups_name', (user_id,)))
     close_db()
     return groups
 
@@ -144,6 +144,13 @@ def get_users_active_items(user_id):
     close_db()
     return users_active_items
 
+
+
+def get_users_groups_and_items(user_id):
+    db = get_db()
+    groups_and_items = list(db.execute('SELECT * FROM item JOIN groups_items ON groups_items.item_id = item.item_id WHERE item.user_id = ? ORDER BY item_name', (user_id,)))
+    close_db()
+    return groups_and_items
 
 
 def get_group_by_id_for_user(group_id, user_id):

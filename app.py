@@ -428,18 +428,14 @@ def change_quantity_in_group():
 def index():
 
     error = None
-    db = helpers.get_db()
     user = helpers.get_user_by_id(session['user_id'])
 
     if not user:
         error = "Failure retreving user account info please try logging on again"
         flash(error)
-        helpers.close_db()
         return redirect(url_for('login'))
 
-    db.execute('UPDATE users SET date_last_active = ? WHERE user_id = ?', (datetime.utcnow(), session['user_id']))
-    db.commit()
-    helpers.close_db()
+    helpers.update_users_date_last_active(session['user_id'])
     return render_template("/index.html")
 
 
@@ -500,9 +496,7 @@ def my_items():
 @helpers.login_required
 def my_items_data():
 
-    db = helpers.get_db()
-    item = list(db.execute("SELECT * FROM item WHERE user_id = ? ORDER BY item_name", (session['user_id'],)))
-    helpers.close_db()
+    item = helpers.get_users_items(session['user_id'])
     return jsonify(render_template('/ajax_templates/ajax_my_items.html', item=item))
 
 
@@ -512,25 +506,20 @@ def my_items_data():
 def create_item():
 
     error = None
-    db = helpers.get_db()
     new_item_name = request.form.get('item_name').strip()
     if not new_item_name:
         error = 'Cannot create an item with no name, please try again.'
 
     if not error:
-        item_exists = db.execute("SELECT * FROM item WHERE item_name = ? COLLATE NOCASE AND user_id = ?", (new_item_name, session['user_id'],)).fetchone()
+        item_exists = helpers.get_item_by_name_for_user(new_item_name, session['user_id'])
         if item_exists:
             error = 'Item already exists'
 
     if error:
-        item = db.execute("SELECT * FROM item WHERE user_id = ? ORDER BY item_name", (session['user_id'],))
-        item = list(item)
-        helpers.close_db()
+        item = helpers.get_users_items(session['user_id'])
         return jsonify(render_template('/ajax_templates/ajax_my_items.html', item=item, error=error))
 
-    db.execute("INSERT INTO item (user_id, item_name) VALUES (?, ?)", (session['user_id'], new_item_name, ))
-    db.commit()
-    helpers.close_db()
+    helpers.create_item_for_user(new_item_name, session['user_id'])
     return redirect(url_for('my_items_data'))
 
 
@@ -548,7 +537,7 @@ def change_item_name():
         error = 'Please select item and choose a new name before submitting. New name must not be empty.'
 
     if not error:
-        valid_item = db.execute("SELECT * FROM item WHERE user_id = ? AND item_id = ?", (session['user_id'], item_id,)).fetchone()
+        valid_item = helpers.get_item_by_id_for_user(item_id, session['user_id'])
         if not valid_item:
             error = 'Error with item selected, please try again.'
 
@@ -557,13 +546,12 @@ def change_item_name():
             error = 'New item name is the same as old'
 
         elif not valid_item['item_name'].casefold() == item_new_name.casefold():
-            item_exists_with_name = db.execute("SELECT * FROM item WHERE user_id = ? AND item_name = ? COLLATE NOCASE", (session['user_id'], item_new_name)).fetchone()
+            item_exists_with_name = helpers.get_item_by_name_for_user(item_new_name, session['user_id'])
             if item_exists_with_name:
                 error = 'Item with given name exists'
 
     if error:
-        item = db.execute("SELECT * FROM item WHERE user_id = ? ORDER BY item_name", (session['user_id'],))
-        item = list(item)
+        item = helpers.get_users_items(session['user_id'])
         helpers.close_db()
         return jsonify(render_template('/ajax_templates/ajax_my_items.html', item=item, error=error))
 
@@ -586,13 +574,12 @@ def delete_item():
         app.logger.error('No item id')
 
     if not error:
-        valid_item = db.execute("SELECT * FROM item WHERE user_id = ? AND item_id = ?", (session['user_id'], item_to_delete)).fetchone()
+        valid_item = helpers.get_item_by_id_for_user(item_to_delete, session['user_id'])
         if not valid_item:
             error = 'Error with item submitted'
 
     if error:
-        item = db.execute("SELECT * FROM item WHERE user_id = ? ORDER BY item_name", (session['user_id'],))
-        item = list(item)
+        item = helpers.get_users_items(session['user_id'])
         helpers.close_db()
         return jsonify(render_template('/ajax_templates/ajax_my_items.html', item=item, error=error))
 
@@ -617,11 +604,9 @@ def my_groups():
 @helpers.login_required
 def my_groups_data():
 
-    db = helpers.get_db()
-    groups = list(db.execute("SELECT * FROM groups WHERE user_id = ? ORDER BY groups_name", (session['user_id'],)))
-    group_items = list(db.execute("SELECT groups_items.groups_id, item.item_id, item.item_name, groups_items.quantity, item.user_id, groups_items.groups_items_id FROM item JOIN groups_items ON groups_items.item_id = item.item_id WHERE item.user_id = ? ORDER BY item_name", (session['user_id'],)))
-    users_items = list(db.execute("SELECT * FROM item WHERE user_id = ? ORDER BY item_name", (session['user_id'],)))
-    helpers.close_db()
+    groups = helpers.get_users_groups(session['user_id'])
+    group_items = helpers.get_users_groups_and_items(session['user_id'])
+    users_items = helpers.get_users_items(session['user_id'])
     return jsonify(render_template("/ajax_templates/ajax_my_groups.html", groups=groups, group_items=group_items, users_items=users_items))
 
 
@@ -647,10 +632,10 @@ def create_group():
         db.commit()
         helpers.close_db()
         return redirect(url_for('my_groups_data')) 
-    
-    groups = list(db.execute("SELECT * FROM groups WHERE user_id = ? ORDER BY groups_name", (session['user_id'],)))
-    group_items = list(db.execute("SELECT groups_items.groups_id, item.item_id, item.item_name, groups_items.quantity, item.user_id FROM item JOIN groups_items ON groups_items.item_id = item.item_id WHERE item.user_id = ? ORDER BY item_name", (session['user_id'],)))
-    users_items = list(db.execute("SELECT * FROM item WHERE user_id = ? ORDER BY item_name", (session['user_id'],)))
+
+    groups = helpers.get_users_groups(session['user_id'])
+    group_items = helpers.get_users_groups_and_items(session['user_id'])
+    users_items = helpers.get_users_items(session['user_id'])
     helpers.close_db()
     return jsonify(render_template("/ajax_templates/ajax_my_groups.html", groups=groups, group_items=group_items, users_items=users_items, error=error))
 
@@ -742,10 +727,16 @@ def add_item_to_group():
 
 
 
+@app.route("/favicon.ico")
+def favicon():
+    return 'favicon placeholder'
+
+
 
 @app.errorhandler(404)
 def page_not_found(error):
     flash('Invalid route')
+    app.logger.error('error 404 route')
     return redirect(url_for('index'))
 
 
@@ -753,4 +744,5 @@ def page_not_found(error):
 @app.errorhandler(405)
 def page_not_found(error):
     flash('Method not allowed for route')
+    app.logger.error('error 405 route')
     return redirect(url_for('index'))
