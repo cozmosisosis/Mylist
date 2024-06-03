@@ -662,9 +662,9 @@ def delete_group():
         helpers.close_db()
         return redirect(url_for('my_groups_data'))
 
-    groups = list(db.execute("SELECT * FROM groups WHERE user_id = ? ORDER BY groups_name", (session['user_id'],)))
-    group_items = list(db.execute("SELECT groups_items.groups_id, item.item_id, item.item_name, groups_items.quantity, item.user_id FROM item JOIN groups_items ON groups_items.item_id = item.item_id WHERE item.user_id = ? ORDER BY item_name", (session['user_id'],)))
-    users_items = list(db.execute("SELECT * FROM item WHERE user_id = ? ORDER BY item_name", (session['user_id'],)))
+    groups = helpers.get_users_groups(session['user_id'])
+    group_items = helpers.get_users_groups_and_items(session['user_id'])
+    users_items = helpers.get_users_items(session['user_id'])
     helpers.close_db()
     return jsonify(render_template("/ajax_templates/ajax_my_groups.html", groups=groups, group_items=group_items, users_items=users_items, error=error))
 
@@ -693,16 +693,16 @@ def add_item_to_group():
 
 
     if not error:
-        users_group = db.execute("SELECT * FROM groups WHERE groups_id = ? and user_id = ?", (selected_group, session['user_id'],)).fetchone()
+        users_group = helpers.get_group_by_id_for_user(selected_group, session['user_id'])
         if users_group is None:
             error = 'Group submitted is invalid'
 
     if not error:
-        existing_item = db.execute("SELECT * FROM item WHERE item_name = ? COLLATE NOCASE and user_id = ?", (submitted_item, session['user_id'],)).fetchone()
+        existing_item = helpers.get_item_by_name_for_user(submitted_item, session['user_id'])
         if not existing_item:
-            db.execute("INSERT INTO item (user_id, item_name) VALUES (?, ?)", (session['user_id'], submitted_item,))
-            db.commit()
-            new_item = db.execute("SELECT * FROM item WHERE item_name = ? COLLATE NOCASE and user_id = ?", (submitted_item, session['user_id'],)).fetchone()
+            helpers.create_item_for_user(submitted_item, session['user_id'])
+            new_item = helpers.get_item_by_name_for_user(submitted_item, session['user_id'])
+            
             db.execute('INSERT INTO groups_items (groups_id, item_id, quantity) VALUES (?, ?, ?)', (selected_group, new_item['item_id'], inputed_quantity))
             db.commit()
             helpers.close_db()
@@ -719,9 +719,9 @@ def add_item_to_group():
 
 
 
-    groups = list(db.execute("SELECT * FROM groups WHERE user_id = ? ORDER BY groups_name", (session['user_id'],)))
-    group_items = list(db.execute("SELECT groups_items.groups_id, item.item_id, item.item_name, groups_items.quantity, item.user_id FROM item JOIN groups_items ON groups_items.item_id = item.item_id WHERE item.user_id = ? ORDER BY item_name", (session['user_id'],)))
-    users_items = list(db.execute("SELECT * FROM item WHERE user_id = ? ORDER BY item_name", (session['user_id'],)))
+    groups = helpers.get_users_groups(session['user_id'])
+    group_items = helpers.get_users_groups_and_items(session['user_id'])
+    users_items = helpers.get_users_items(session['user_id'])
     helpers.close_db()
     return jsonify(render_template("/ajax_templates/ajax_my_groups.html", groups=groups, group_items=group_items, users_items=users_items, error=error))
 
