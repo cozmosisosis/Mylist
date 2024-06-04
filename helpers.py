@@ -271,9 +271,35 @@ def update_user_email(new_email, user_id):
 
 
 
+def get_item_in_group(user_id, groups_items_id):
+    db = get_db()
+    item_in_group = db.execute('SELECT * FROM groups_items JOIN groups ON groups_items.groups_id = groups.groups_id WHERE groups.user_id = ? AND groups_items.groups_items_id = ?', (user_id, groups_items_id,)).fetchone()
+    close_db()
+    return item_in_group
+
+
+
+def update_groups_items_quantity(new_quantity, groups_item_id):
+    db = get_db()
+    db.execute('UPDATE groups_items SET quantity = ? WHERE groups_items_id = ?', (new_quantity, groups_item_id,))
+    db.commit()
+    close_db()
+    return
+
+
+
+def delete_item_from_group(groups_item_id):
+    db = get_db()
+    db.execute('DELETE FROM groups_items WHERE groups_items_id = ?', (groups_item_id,))
+    db.commit()
+    close_db()
+    return
+
+
+
 # def ():
 #     db = get_db()
-#     db.execute()
+#     db.execute('')
 #     db.commit()
 #     close_db()
 #     return

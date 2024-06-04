@@ -389,27 +389,20 @@ def edit_account_route(info_to_edit):
 @helpers.login_required
 def change_quantity_in_group():
 
-    db = helpers.get_db()
     groups_items_id = request.form.get('id')
     value = request.form.get('value')
 
-    valid_groups_item = db.execute("SELECT * FROM groups_items JOIN groups ON groups_items.groups_id = groups.groups_id WHERE groups.user_id = ? AND groups_items.groups_items_id = ?", (session['user_id'], groups_items_id)).fetchone()
+    valid_groups_item = helpers.get_item_in_group(session['user_id'], groups_items_id)
     if not valid_groups_item:
-        app.logger.error(groups_items_id)
-        helpers.close_db()
         return redirect(url_for('my_groups_data'))
 
     value = int(value)
     if value > 0:
-        db.execute("UPDATE groups_items SET quantity = ? WHERE groups_items_id = ?", (value, groups_items_id,))
-        db.commit()
-        helpers.close_db()
+        helpers.update_groups_items_quantity(value, groups_items_id)
         return redirect(url_for('my_groups_data'))
 
     else:
-        db.execute("DELETE FROM groups_items WHERE groups_items_id = ?", (groups_items_id,))
-        db.commit()
-        helpers.close_db()
+        helpers.delete_item_from_group(groups_items_id)
         return redirect(url_for('my_groups_data'))
 
 
