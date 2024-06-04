@@ -232,3 +232,48 @@ def update_groups_name(new_name, groups_id, user_id):
     db.commit()
     close_db()
     return
+
+
+
+def delete_user(user_id):
+    db = get_db()
+    db.execute('DELETE FROM users WHERE user_id =?', (user_id,))
+    db.commit()
+    close_db()
+    return
+
+
+
+def update_username(user_id, new_username):
+    db = get_db()
+    db.execute('UPDATE users SET username = ? WHERE user_id = ?', (new_username, user_id,))
+    db.commit()
+    close_db()
+    return
+
+
+
+def update_user_password(new_hashed_password, user_id):
+    db = get_db()
+    db.execute('UPDATE users SET hashed_password = ? WHERE user_id = ?', (new_hashed_password, user_id))
+    db.commit()
+    close_db()
+    return
+
+
+
+def update_user_email(new_email, user_id):
+    db = get_db()
+    db.execute('UPDATE users SET user_email = ? WHERE user_id = ?', (new_email, user_id))
+    db.commit()
+    close_db()
+    return
+
+
+
+# def ():
+#     db = get_db()
+#     db.execute()
+#     db.commit()
+#     close_db()
+#     return

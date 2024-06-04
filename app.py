@@ -283,9 +283,7 @@ def change_group_name():
 @helpers.login_required
 def delete_account():
 
-    db = helpers.get_db()
     if request.method == 'GET':
-        helpers.close_db()
         return render_template('delete_account.html')
 
     username = request.form['username']
@@ -293,24 +291,15 @@ def delete_account():
 
     if not username or not password:
         flash('Must fill out both username and password to DELETE account')
-        helpers.close_db()
         return redirect(url_for('delete_account'))
 
     user = helpers.get_user_by_id(session['user_id'])
 
-
     if user is None or username != user['username'] or not check_password_hash(user['hashed_password'], password):
         flash('Error with submitted User Info for deletion. Please log out, log back in, and then try deleting account again.')
-        helpers.close_db()
         return redirect(url_for('delete_account'))
 
-
-
-    db.execute("DELETE FROM users WHERE user_id = ?", (session['user_id'],))
-
-    db.commit()
-    helpers.close_db()
-
+    helpers.delete_user(session['user_id'])
     session.clear()
     flash("Account Deleted")
     return redirect(url_for('login'))
@@ -369,14 +358,14 @@ def edit_account_route(info_to_edit):
                 flash('Inputed new username is the same as old username')
                 helpers.close_db()
                 return redirect(f'/edit_account/{info_to_edit}')
-            db.execute("UPDATE users SET username = ? WHERE user_id = ?", (new_value, session['user_id'],))
+            helpers.update_username(session['user_id'], new_value)
         elif value_edditing == 'password':
             value_edditing = 'hashed_password'
             if check_password_hash(user['hashed_password'], new_value):
                 flash('Inputed new password is the same as old password')
                 helpers.close_db()
                 return redirect(f'/edit_account/{info_to_edit}')
-            db.execute("UPDATE users SET hashed_password = ? WHERE user_id = ?", ( generate_password_hash(new_value), session['user_id'],))
+            helpers.update_user_password(generate_password_hash(new_value), session['user_id'])
         elif value_edditing == 'email':
             value_edditing = 'user_email'
             if user['user_email'] == new_value:
@@ -384,6 +373,8 @@ def edit_account_route(info_to_edit):
                 helpers.close_db()
                 return redirect(f'/edit_account/{info_to_edit}')
             try:
+                # This is a bad method, avoid possible error by checking if email exists before
+                # attempting to insert
                 db.execute("UPDATE users SET user_email = ? WHERE user_id = ?", (new_value, session['user_id'],))
             except:
                 flash('Unable to add email, email already associated with an account')
