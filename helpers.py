@@ -89,6 +89,13 @@ def get_single_user_active_item(user_id, item_id, groups_id):
 
 
 
+def get_active_item_by_active_item_id(user_id, active_item_id):
+    db = get_db()
+    active_item = db.execute('SELECT * FROM user_active_items WHERE user_id = ? AND user_active_items_id = ?', (user_id, active_item_id,)).fetchone()
+    close_db()
+    return active_item
+
+
 
 def get_active_item_with_null_group(item_id, user_id):
     
@@ -113,6 +120,15 @@ def update_active_item_with_null_group_quantity(item_id, user_id, quantity):
     
     db = get_db()
     db.execute('UPDATE user_active_items SET active_items_quantity = ? WHERE item_id = ? AND user_id = ? AND groups_id IS NULL', (quantity, item_id, user_id))
+    db.commit()
+    close_db()
+    return True
+
+
+
+def update_active_item_quantity_by_active_item_id(value, user_active_items_id):
+    db = get_db()
+    db.execute('UPDATE user_active_items SET active_items_quantity = ? WHERE user_active_items_id = ?', (value, user_active_items_id,))
     db.commit()
     close_db()
     return True
@@ -237,7 +253,16 @@ def update_groups_name(new_name, groups_id, user_id):
 
 def delete_user(user_id):
     db = get_db()
-    db.execute('DELETE FROM users WHERE user_id =?', (user_id,))
+    db.execute('DELETE FROM users WHERE user_id = ?', (user_id,))
+    db.commit()
+    close_db()
+    return
+
+
+
+def delete_user_active_item(active_item_id):
+    db = get_db()
+    db.execute('DELETE FROM user_active_items WHERE user_active_items_id = ?', (active_item_id,))
     db.commit()
     close_db()
     return

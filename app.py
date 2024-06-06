@@ -439,7 +439,6 @@ def active_list_data():
 @helpers.login_required
 def active_list():
 
-    db = helpers.get_db()
     user_active_items_id = request.form.get('id')
     value = request.form.get('value')
     if not value or not user_active_items_id or type(int(value)) is not int or not int(user_active_items_id):
@@ -448,20 +447,18 @@ def active_list():
 
     value = int(value)
     user_active_items_id = int(user_active_items_id)
-    valid_user_active_items = db.execute("SELECT * FROM user_active_items WHERE user_id = ? AND user_active_items_id = ?", (session['user_id'], user_active_items_id)).fetchone()
+    valid_user_active_items = helpers.get_active_item_by_active_item_id(session['user_id'], user_active_items_id)
 
     if not valid_user_active_items:
         app.logger.error('invalid active item')
         return redirect(url_for('active_list_data'))
 
     if value > 0:
-        db.execute("UPDATE user_active_items SET active_items_quantity = ? WHERE user_active_items_id = ?", (value, user_active_items_id))
-        db.commit()
+        helpers.update_active_item_quantity_by_active_item_id(value, user_active_items_id)
         return redirect(url_for('active_list_data'))
 
     else:
-        db.execute("DELETE FROM user_active_items WHERE user_active_items_id = ?", (user_active_items_id,))
-        db.commit()
+        helpers.delete_user_active_item(user_active_items_id)
         return redirect(url_for('active_list_data'))
 
 
