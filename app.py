@@ -510,7 +510,6 @@ def create_item():
 def change_item_name():
 
     error = None
-    db = helpers.get_db()
     item_id = request.form.get('item_id')
     item_new_name = request.form.get('item_new_name').strip()
 
@@ -533,12 +532,10 @@ def change_item_name():
 
     if error:
         item = helpers.get_users_items(session['user_id'])
-        helpers.close_db()
         return jsonify(render_template('/ajax_templates/ajax_my_items.html', item=item, error=error))
 
 
-    db.execute("UPDATE item SET item_name = ? WHERE user_id = ? AND item_id = ?", (item_new_name, session['user_id'], item_id))
-    db.commit()
+    helpers.change_item_name(item_new_name, session['user_id'], item_id)
     return redirect(url_for('my_items_data'))
 
 
@@ -548,7 +545,6 @@ def change_item_name():
 def delete_item():
 
     error = None
-    db = helpers.get_db()
     item_to_delete = request.form.get('item_id')
     if not item_to_delete:
         error = 'Error no item found in submition'
@@ -561,11 +557,9 @@ def delete_item():
 
     if error:
         item = helpers.get_users_items(session['user_id'])
-        helpers.close_db()
         return jsonify(render_template('/ajax_templates/ajax_my_items.html', item=item, error=error))
 
-    db.execute("DELETE FROM item WHERE user_id = ? AND item_id = ?", (session['user_id'], item_to_delete))
-    db.commit()
+    helpers.delete_item(session['user_id'], item_to_delete)
     return redirect(url_for('my_items_data'))
     
 # BEST TECHNIQUE SO FAR END

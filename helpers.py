@@ -322,6 +322,25 @@ def delete_item_from_group(groups_item_id):
 
 
 
+def change_item_name(new_name, user_id, item_id):
+    db = get_db()
+    db.execute('UPDATE item SET item_name = ? WHERE user_id = ? AND item_id = ?', (new_name, user_id, item_id))
+    db.commit()
+    close_db()
+    return
+
+
+
+def delete_item(user_id, item_id):
+    db = get_db()
+    db.execute('DELETE FROM item WHERE user_id = ? AND item_id = ?', (user_id, item_id,))
+    db.commit()
+    close_db()
+    return
+
+
+
+
 # def ():
 #     db = get_db()
 #     db.execute('')
