@@ -591,27 +591,23 @@ def my_groups_data():
 def create_group():
 
     error = None
-    db = helpers.get_db()
     new_group_name = request.form.get('new_group_name').strip()
 
     if not new_group_name:
         error = 'Must fill out name to create new group'
 
     if not error:
-        existing_group = db.execute("SELECT * FROM groups WHERE user_id = ? AND groups_name = ? COLLATE NOCASE", (session['user_id'], new_group_name,)).fetchone()
+        existing_group = helpers.get_group_by_name(session['user_id'], new_group_name)
         if existing_group:
             error = 'Group already exists'
 
-    if not error:    
-        db.execute("INSERT INTO groups (user_Id, groups_name) VALUES (?, ?)", (session['user_id'], new_group_name))
-        db.commit()
-        helpers.close_db()
+    if not error:
+        helpers.create_group(session['user_id'], new_group_name)
         return redirect(url_for('my_groups_data')) 
 
     groups = helpers.get_users_groups(session['user_id'])
     group_items = helpers.get_users_groups_and_items(session['user_id'])
     users_items = helpers.get_users_items(session['user_id'])
-    helpers.close_db()
     return jsonify(render_template("/ajax_templates/ajax_my_groups.html", groups=groups, group_items=group_items, users_items=users_items, error=error))
 
 
@@ -621,26 +617,23 @@ def create_group():
 def delete_group():
 
     error = None
-    db = helpers.get_db()
     group_to_delete = request.form.get('group_to_delete')
     if not group_to_delete:
         error = 'Error with group selected, no value found'
 
     if not error:
-        valid_group = db.execute("SELECT * FROM groups WHERE user_id = ? AND groups_id = ?", (session['user_id'], group_to_delete)).fetchone()
+        valid_group = helpers.get_group_by_id_for_user(group_to_delete, session['user_id'])
         if not valid_group:
             error = 'Error with group trying to delete'
 
     if not error:
-        db.execute("DELETE FROM groups WHERE user_id = ? AND groups_id = ?", (session['user_id'], group_to_delete))
-        db.commit()
-        helpers.close_db()
+        helpers.delete_users_group(session['user_id'], group_to_delete)
+        app.logger.error('deleetet deleetet')
         return redirect(url_for('my_groups_data'))
 
     groups = helpers.get_users_groups(session['user_id'])
     group_items = helpers.get_users_groups_and_items(session['user_id'])
     users_items = helpers.get_users_items(session['user_id'])
-    helpers.close_db()
     return jsonify(render_template("/ajax_templates/ajax_my_groups.html", groups=groups, group_items=group_items, users_items=users_items, error=error))
 
 
@@ -678,12 +671,11 @@ def add_item_to_group():
             helpers.create_item_for_user(submitted_item, session['user_id'])
             new_item = helpers.get_item_by_name_for_user(submitted_item, session['user_id'])
             
-            db.execute('INSERT INTO groups_items (groups_id, item_id, quantity) VALUES (?, ?, ?)', (selected_group, new_item['item_id'], inputed_quantity))
-            db.commit()
+            helpers.add_item_to_group(selected_group, new_item['item_id'], inputed_quantity)
             helpers.close_db()
             return redirect(url_for('my_groups_data'))
         else:
-            item_in_group = db.execute("SELECT * FROM groups_items WHERE groups_id = ? AND item_id = ?", (selected_group, existing_item['item_id'],)).fetchone()
+            item_in_group = helpers.item_in_group_by_item_id(selected_group, existing_item['item_id'])
             if not item_in_group:
                 db.execute("INSERT INTO groups_items (groups_id, item_id, quantity) VALUES (?, ?, ?)", (selected_group, existing_item['item_id'], inputed_quantity))
                 db.commit()

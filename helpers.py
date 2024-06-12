@@ -340,6 +340,49 @@ def delete_item(user_id, item_id):
 
 
 
+def get_group_by_name(user_id, group_name):
+    db = get_db()
+    group = db.execute('SELECT * FROM groups WHERE user_id = ? AND groups_name = ? COLLATE NOCASE', (user_id, group_name,)).fetchone()
+    close_db()
+    return group
+
+
+
+def create_group(user_id, group_name):
+    db = get_db()
+    db.execute('INSERT INTO groups (user_id, groups_name) VALUES (?, ?)', (user_id, group_name,))
+    db.commit()
+    close_db()
+    return
+
+
+
+def delete_users_group(user_id, groups_id):
+    db = get_db()
+    db.execute('DELETE FROM groups WHERE user_id = ? AND groups_id = ?', (user_id, groups_id,))
+    db.commit()
+    close_db()
+    return
+
+
+
+def add_item_to_group(groups_id, item_id, quantity):
+    db = get_db()
+    db.execute('INSERT INTO groups_items (groups_id, item_id, quantity) VALUES (?, ?, ?)', (groups_id, item_id, quantity))
+    db.commit()
+    close_db()
+    return
+
+
+
+def item_in_group_by_item_id (group_id, item_id):
+    db = get_db()
+    item = db.execute('SELECT * FROM groups_items WHERE groups_id = ? AND item_id = ?', (group_id, item_id)).fetchone()
+    close_db()
+    return item
+
+
+
 
 # def ():
 #     db = get_db()
