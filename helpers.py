@@ -383,6 +383,14 @@ def item_in_group_by_item_id (group_id, item_id):
 
 
 
+def get_user_by_email(email):
+    db = get_db()
+    user = db.execute('SELECT * FROM users WHERE user_email = ?', (email,)).fetchone()
+    close_db()
+    return user
+
+
+
 
 # def ():
 #     db = get_db()

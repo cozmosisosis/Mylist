@@ -322,7 +322,6 @@ def edit_account():
 @helpers.login_required
 def edit_account_route(info_to_edit):
 
-    db = helpers.get_db()
     valid_routes = ['username', 'password', 'email']
 
     if info_to_edit not in valid_routes:
@@ -345,42 +344,35 @@ def edit_account_route(info_to_edit):
 
         user = helpers.get_user_by_id(session['user_id'])
 
-
-
         if current_username != user['username'] or not check_password_hash(user['hashed_password'], current_password) or session['user_id'] != user['user_id']:
             flash('Account not verified, please try again')
-            helpers.close_db()
             return redirect(f'/edit_account/{info_to_edit}')
 
 
         if value_edditing == 'username':
             if user['username'] == new_value:
                 flash('Inputed new username is the same as old username')
-                helpers.close_db()
                 return redirect(f'/edit_account/{info_to_edit}')
             helpers.update_username(session['user_id'], new_value)
         elif value_edditing == 'password':
             value_edditing = 'hashed_password'
             if check_password_hash(user['hashed_password'], new_value):
                 flash('Inputed new password is the same as old password')
-                helpers.close_db()
                 return redirect(f'/edit_account/{info_to_edit}')
             helpers.update_user_password(generate_password_hash(new_value), session['user_id'])
         elif value_edditing == 'email':
             value_edditing = 'user_email'
             if user['user_email'] == new_value:
                 flash('Inputed new email is the same as old email')
-                helpers.close_db()
                 return redirect(f'/edit_account/{info_to_edit}')
-            try:
-                # This is a bad method, avoid possible error by checking if email exists before
-                # attempting to insert
-                db.execute("UPDATE users SET user_email = ? WHERE user_id = ?", (new_value, session['user_id'],))
-            except:
+            
+            user_with_email = helpers.get_user_by_email(new_value)
+            if user_with_email:
                 flash('Unable to add email, email already associated with an account')
 
-        db.commit()
-        helpers.close_db()
+            else:
+                helpers.update_user_email(new_value, session['user_id'])
+
         return redirect(url_for('account'))
 
 
@@ -643,12 +635,9 @@ def delete_group():
 def add_item_to_group():
 
     error = None
-    db = helpers.get_db()
-
     selected_group = request.form.get('groups')
     submitted_item = request.form.get('item_to_add')
     inputed_quantity = request.form.get('quantity')
-
 
 
     if not selected_group or not submitted_item or not inputed_quantity:
@@ -672,14 +661,11 @@ def add_item_to_group():
             new_item = helpers.get_item_by_name_for_user(submitted_item, session['user_id'])
             
             helpers.add_item_to_group(selected_group, new_item['item_id'], inputed_quantity)
-            helpers.close_db()
             return redirect(url_for('my_groups_data'))
         else:
             item_in_group = helpers.item_in_group_by_item_id(selected_group, existing_item['item_id'])
             if not item_in_group:
-                db.execute("INSERT INTO groups_items (groups_id, item_id, quantity) VALUES (?, ?, ?)", (selected_group, existing_item['item_id'], inputed_quantity))
-                db.commit()
-                helpers.close_db()
+                helpers.add_item_to_group(selected_group, existing_item['item_id'], inputed_quantity)
                 return redirect(url_for('my_groups_data'))
             else:
                 error = 'Item is in groups already, to change quantity or remove from group, use the quantity input by the item in the group you would like to change'
@@ -689,7 +675,6 @@ def add_item_to_group():
     groups = helpers.get_users_groups(session['user_id'])
     group_items = helpers.get_users_groups_and_items(session['user_id'])
     users_items = helpers.get_users_items(session['user_id'])
-    helpers.close_db()
     return jsonify(render_template("/ajax_templates/ajax_my_groups.html", groups=groups, group_items=group_items, users_items=users_items, error=error))
 
 
