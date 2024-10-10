@@ -8,6 +8,7 @@ MyList Login Page
 
 
 {% block main %}
+
 <div>
 
     <div >
@@ -21,10 +22,34 @@ MyList Login Page
     </div>
 
     <div>
-        Welcome to MyList Login page! <br> Please Login
+        TEST PAGE FOR STYLING <br> Welcome to MyList Login page! <br> Please Login
     </div>
 
-    <div>
+    <div class="container-fluid p-1 m-1 border">
+
+        <div class="p-0 m-0">
+            <form action="/login" method="post" class="container-fluid p-0 m-0">
+                <div class="">
+                <label for="username" class="form-label">Username</label>
+                <input class="form-control" id="username" aria-describedby="Username" type="text" name="username" autocomplete="off" placeholder="Username" autofocus>
+                <div id="Username" class="form-text">We'll never share your email with anyone else.</div>
+                </div>
+                <div class="mb-3">
+                <label for="Password" class="form-label">Password</label>
+                <input type="password" class="form-control" id="Password" name="password" autocomplete="off" placeholder="Password">
+                </div>
+                <div class="mb-3 form-check">
+                <input type="checkbox" class="form-check-input" id="exampleCheck1">
+                <label class="form-check-label" for="exampleCheck1">Check me out</label>
+                </div>
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </form>
+        </div>
+    </div>
+
+    
+
+    <!-- <div>
         <table>
             <form action="/login" method="post">
                 <tr>
@@ -49,7 +74,9 @@ MyList Login Page
                 </tr>
             </form>
         </table>
-    </div>
+    </div> -->
+
+
 </div>
 
 {% endblock %}
