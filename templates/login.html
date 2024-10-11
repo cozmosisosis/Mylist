@@ -9,9 +9,9 @@ MyList Login Page
 
 {% block main %}
 
-<div>
+<div class="bg-primary" style="--bs-bg-opacity: .05;">
 
-    <div >
+    <div>
         {% with messages = get_flashed_messages() %}
         {% if messages %}
         {% for message in messages %}
@@ -21,13 +21,17 @@ MyList Login Page
         {% endwith %}
     </div>
 
-    <div>
-        TEST PAGE FOR STYLING <br> Welcome to MyList Login page! <br> Please Login
-    </div>
+    
 
-    <div class="container-fluid p-1 m-1 border">
 
-        <div class="p-0 m-0">
+
+    <div class="container-fluid p-5 m-0 d-flex justify-content-center">
+        <div class="p-4 m-4 border rounded-3 shadow-lg bg-white" style="width: 450px;">
+            
+            <div>
+                TEST PAGE FOR STYLING <br> Welcome to MyList Login page! <br> Please Login
+            </div>
+
             <form action="/login" method="post" class="container-fluid p-0 m-0">
                 <div class="">
                 <label for="username" class="form-label">Username</label>
@@ -46,6 +50,9 @@ MyList Login Page
             </form>
         </div>
     </div>
+
+
+    
 
     
 
