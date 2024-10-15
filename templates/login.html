@@ -26,27 +26,28 @@ MyList Login Page
 
 
     <div class="container-fluid p-5 m-0 d-flex justify-content-center">
+
+        <div>A</div>
+        
         <div class="p-4 m-4 border rounded-3 shadow-lg bg-white" style="width: 450px;">
             
             <div>
-                TEST PAGE FOR STYLING <br> Welcome to MyList Login page! <br> Please Login
+                 <h3>MyList</h3>
+                 <br>
             </div>
 
             <form action="/login" method="post" class="container-fluid p-0 m-0">
                 <div class="">
-                <label for="username" class="form-label">Username</label>
                 <input class="form-control" id="username" aria-describedby="Username" type="text" name="username" autocomplete="off" placeholder="Username" autofocus>
-                <div id="Username" class="form-text">We'll never share your email with anyone else.</div>
                 </div>
+                <br>
                 <div class="mb-3">
-                <label for="Password" class="form-label">Password</label>
                 <input type="password" class="form-control" id="Password" name="password" autocomplete="off" placeholder="Password">
                 </div>
-                <div class="mb-3 form-check">
-                <input type="checkbox" class="form-check-input" id="exampleCheck1">
-                <label class="form-check-label" for="exampleCheck1">Check me out</label>
+                <div class="d-flex justify-content-between">
+                <button type="submit" class="btn btn-primary">Login</button>
+                <a href="/register" class="btn btn-light text-secondary">Create New Account</a>
                 </div>
-                <button type="submit" class="btn btn-primary">Submit</button>
             </form>
         </div>
     </div>
