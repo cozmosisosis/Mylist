@@ -17,25 +17,28 @@
     <script>window.jQuery || document.write('<script src="{{url_for('static', filename = 'jquery.js') }}">\x3C/script>')</script>
     <script>$SCRIPT_ROOT = {{ request.script_root|tojson }};</script>
 
+    <div class="container-fluid d-flex flex-column h-100">
+
     {% block loggedin %}{% endblock %}
 
     {% block main %}
 
     {% endblock %}
-    <div class="container-fluid position-absolute bottom-0">
-        <footer class="py-3 my-3">
-            <ul class="nav justify-content-evenly border-top pb-3 mb-3">
+    <div class="container-fluid align-content-center mt-auto">
+        <footer class="py-3 ">
+            <ul class="nav justify-content-evenly border-top pb-5 mb-5">
                 <li class="nav-item">
                     <a class="nav-link px-2 text-body-secondary" href="https://github.com/cozmosisosis/Mylist">Project Source Code</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link px-2 text-body-secondary" href="https://www.heroku.com">Hosting From Heroku</a>
+                    <a class="nav-link px-2 text-body-secondary" href="https://www.heroku.com/python?utm_source=google&utm_medium=paid_search&utm_campaign=amer_heraw&utm_content=language-branded-search-rsa&utm_term=heroku%20python&utm_source_platform=GoogleAds&gad_source=1&gclid=Cj0KCQjw99e4BhDiARIsAISE7P89q_6u0FJpuuYFoA0qnr18ELJY5KMH0SQKZQkd-uFysXVLEAknoKsaAh2sEALw_wcB">Hosting From Heroku</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link px-2 text-body-secondary" href="https://getbootstrap.com/">Styling With Bootstrap</a>
                 </li>
             </ul>
         </footer>
+    </div>
     </div>
     <script src="{{ url_for('static', filename='script_mylist_maintemplate.js') }}"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
