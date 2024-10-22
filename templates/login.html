@@ -89,10 +89,10 @@ MyList Login Page
                     
                     <div class="p-3 m-3 ">
 
-                    <div>
+                    <!-- <div>
                          <h3>MyList</h3>
                          <br>
-                    </div>
+                    </div> -->
         
                     <form action="/login" method="post" class="container-fluid p-0 m-0">
                         <div class="">
@@ -102,10 +102,20 @@ MyList Login Page
                         <div class="mb-3">
                         <input type="password" class="form-control" id="Password" name="password" autocomplete="off" placeholder="Password">
                         </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="fw-bold fs-3 btn btn-primary w-100">Login</button>
+                        </div>
+                        <div class="mt-3 border-top">If you are new here you can either create an Account
+                            (Do not use any sensitive information ie real name or email address) or you 
+                            can contact the creator for login info to test the functionality.
+                        </div>
+                        <br>
                         <div class="d-flex justify-content-between">
                         <button type="submit" class="btn btn-primary">Login</button>
                         <a href="/register" class="btn btn-light text-secondary">Create New Account</a>
                         </div>
+
                     </form>
                 </div>
                 </div>
