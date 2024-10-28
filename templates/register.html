@@ -20,13 +20,94 @@ MyList Account Creation Page
         {% endwith %}
     </div>
 
-    <div>
-        Welcome to MyList Registration page! <br> Please Create an Account <br>
-    </div>
-
-    <div class="py-5">WARNING!!!! <br> DO NOT USE ANY SENSITIVE INFORMATION (ie real name, password, email). <br>
+    <div class="py-3">WARNING!!!! <br> DO NOT USE ANY SENSITIVE INFORMATION (ie real name, password, email). <br>
     THIS PROJECT IS STILL IN DEVELOPMENT 
     </div>
+
+
+    <div class="container-fluid p-0 m-0">
+        
+        <div class="row d-flex justify-content-center">
+            <!--Small screen logo-->
+            <div class="d-block d-md-none">
+                <div class="border my-3" style="height: 150px;">
+                    
+                    <div class="p-3 m-3 ">
+
+                    <div>
+                         <h3>LOGO PLACEHOLDER</h3>
+                         <br>
+                    </div>
+
+                    
+                </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row d-flex justify-content-center">
+
+            <!--Large screen logo-->
+            <div class=" d-none d-md-block col-12 col-sm-8 px-0 px-sm-3" style="max-width: 450px;">
+
+                <div class="border" style="height: 400px;">
+                    
+                    <div class="p-3 m-3 ">
+
+                    <div>
+                         <h3>LOGO PLACEHOLDER</h3>
+                         <br>
+                    </div>
+
+                    <div>
+                        
+                    </div>
+        
+                
+                </div>
+                </div>
+            </div>
+
+            <div class="col-12 col-sm-8" style="max-width: 450px;">
+
+                <div class="border shadow-lg bg-white">
+                    
+                    <div class="p-3 m-3 ">
+
+                        <form class="row g-3">
+                            <div class="col-12">
+                              <label for="username" class="form-label" >Username</label>
+                              <input type="email" class="form-control" id="username" autofocus>
+                            </div>
+                            <div class="col-6">
+                              <label for="password" class="form-label">Password</label>
+                              <input type="password" class="form-control" id="password">
+                            </div>
+                            <div class="col-6">
+                                <label for="password_verification" class="form-label">Password Verification</label>
+                                <input type="password_verification" class="form-control" id="password_verification">
+                            </div>
+                            <div class="col-6">
+                              <label for="email" class="form-label">Email</label>
+                              <input type="text" class="form-control" id="email">
+                            </div>
+                            <div class="col-6">
+                              <label for="email_verification" class="form-label">Email Verification</label>
+                              <input type="text" class="form-control" id="email_verification">
+                            </div>
+                            
+                            <div class="col-12">
+                              <button type="submit" class="btn btn-primary">Sign in</button>
+                            </div>
+                          </form>
+                    
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
 
     <div>
         <table>
@@ -40,7 +121,7 @@ MyList Account Creation Page
             <form >
                 <tr>
                     <td>
-                        <input type="text" name="username" placeholder="Username" autocomplete="off" autofocus>
+                        <input type="text" name="username" placeholder="Username" autocomplete="off">
                     </td>
                     <td>
                         <input type="password" name="password" placeholder="Password" autocomplete="off">
