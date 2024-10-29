@@ -18,10 +18,8 @@ MyList Account Creation Page
         {% endfor %}
         {% endif %}
         {% endwith %}
-    </div>
-
-    <div class="py-3">WARNING!!!! <br> DO NOT USE ANY SENSITIVE INFORMATION (ie real name, password, email). <br>
-    THIS PROJECT IS STILL IN DEVELOPMENT 
+        <br> WARNING!!!! <br> DO NOT USE ANY SENSITIVE INFORMATION (ie real name, password, email). <br>
+        THIS PROJECT IS STILL IN DEVELOPMENT
     </div>
 
 
@@ -74,30 +72,34 @@ MyList Account Creation Page
                     
                     <div class="p-3 m-3 ">
 
-                        <form class="row g-3">
+                        <form class="row g-0">
+                            <p class="border-bottom">Account Creation </p>
                             <div class="col-12">
                               <label for="username" class="form-label" >Username</label>
-                              <input type="email" class="form-control" id="username" autofocus>
+                              <input type="text" class="form-control" id="username" name="username" autofocus autocomplete="off">
                             </div>
-                            <div class="col-6">
+                            <div class="col-12">
                               <label for="password" class="form-label">Password</label>
-                              <input type="password" class="form-control" id="password">
+                              <input type="password" class="form-control" id="password" name="password">
                             </div>
-                            <div class="col-6">
+                            <div class="col-12">
                                 <label for="password_verification" class="form-label">Password Verification</label>
-                                <input type="password_verification" class="form-control" id="password_verification">
+                                <input type="password" class="form-control" id="password_verification" name="password_verification">
                             </div>
-                            <div class="col-6">
+                            <div class="col-12">
                               <label for="email" class="form-label">Email</label>
-                              <input type="text" class="form-control" id="email">
+                              <input type="text" class="form-control" id="email" name="email">
                             </div>
-                            <div class="col-6">
+                            <div class="col-12">
                               <label for="email_verification" class="form-label">Email Verification</label>
-                              <input type="text" class="form-control" id="email_verification">
+                              <input type="text" class="form-control" id="email_verification" name="email_verification">
                             </div>
                             
                             <div class="col-12">
-                              <button type="submit" class="btn btn-primary">Sign in</button>
+                              <button type="submit" class="btn btn-primary" formaction="/register" formmethod="post">Sign in</button>
+                            </div>
+                            <div class="col-12">
+                                <button type="submit" class="btn btn secondary" formaction="/login">Already Have An Account</button>
                             </div>
                           </form>
                     
@@ -109,7 +111,7 @@ MyList Account Creation Page
     </div>
 
 
-    <div>
+    <!-- <div>
         <table>
             <tr>
                 <th>Username</th>
@@ -147,7 +149,7 @@ MyList Account Creation Page
                 </tr>
             </form>
         </table>
-    </div>
+    </div> -->
 </div>
 
 {% endblock %}
