@@ -17,9 +17,10 @@
     <script>window.jQuery || document.write('<script src="{{url_for('static', filename = 'jquery.js') }}">\x3C/script>')</script>
     <script>$SCRIPT_ROOT = {{ request.script_root|tojson }};</script>
 
+    {% block loggedin %}{% endblock %}
+
     <div class="container-fluid d-flex flex-column h-100">
 
-    {% block loggedin %}{% endblock %}
 
     {% block main %}
 
