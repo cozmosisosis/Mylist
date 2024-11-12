@@ -11,9 +11,11 @@
 
             <label for="item_to_add">Add an item to your list:</label>
             <input list="item" id="item_to_add" name="item_to_add" autocomplete="off"/>
-            <script>
+
+            <!-- THIS WAS FOR TO AUTO SELECT INPUT FOR NEW ITEMS ON PAGE REFRESH/FORM SUBMIT||| DELETE IF NO LONGER WANTED -->
+            <!-- <script>
                 document.getElementById('item_to_add').select();
-            </script>
+            </script> -->
             
             <datalist id="item" name="item">
                 {% for row in users_items %}
@@ -72,14 +74,21 @@
                 {% endif %}
 
             </td>
-            <td>
+            <!-- <td>
                 {{ rows['active_items_quantity'] }}
-            </td>
+            </td> -->
             <td>
                 <input type="number" onchange="change_quantity(this.id)" onkeyup="change_quantity(this.id)"
                     onclick="this.select();"
                     id="{{ rows['user_active_items_id'] }}" style="width: 40px;"
                     value="{{ rows['active_items_quantity'] }}">
+            </td>
+            <td>
+                <form id="active_list_quantity" method="post">
+                    <input type="hidden" name="id" value="{{ rows['user_active_items_id'] }}">
+                    <input type="hidden" name="value" value="0">
+                    <button class="btn btn-danger" type="submit">X</button>
+                </form>
             </td>
         </tr>
         {% endfor %}
