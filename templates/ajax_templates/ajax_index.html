@@ -11,11 +11,6 @@
 
             <label for="item_to_add">Add an item to your list:</label>
             <input list="item" id="item_to_add" name="item_to_add" autocomplete="off"/>
-
-            <!-- THIS WAS FOR TO AUTO SELECT INPUT FOR NEW ITEMS ON PAGE REFRESH/FORM SUBMIT||| DELETE IF NO LONGER WANTED -->
-            <!-- <script>
-                document.getElementById('item_to_add').select();
-            </script> -->
             
             <datalist id="item" name="item">
                 {% for row in users_items %}
@@ -25,7 +20,7 @@
 
             
             <label for="quantity">Quantity</label>
-            <input type="number" value="1" name="quantity" id="quantity" style="width: 40px;" onclick="this.select();">
+            <input type="number" value="1" name="quantity" id="quantity" style="width: 40px;" onclick="this.select();" pattern="\d*" >
             <input type="submit">
 
         </form>
@@ -45,7 +40,18 @@
             <input type="submit" value="Add all Ingredients From Group">
         </form>
     </div>
-    
+
+    <div class="dropdown">
+        <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" data-bs-auto-close="outside">
+          Dropdown form
+        </button>
+        <form class="dropdown-menu p-4" id="quick_add_item">
+          <div class="mb-3">
+            <input type="" name="item_id" class="form-control">
+          </div>
+          <button type="submit" class="btn btn-primary">Sign in</button>
+        </form>
+      </div>
     
     <table>
         <tr>
@@ -74,11 +80,8 @@
                 {% endif %}
 
             </td>
-            <!-- <td>
-                {{ rows['active_items_quantity'] }}
-            </td> -->
             <td>
-                <input type="number" onchange="change_quantity(this.id)" onkeyup="change_quantity(this.id)"
+                <input type="number" pattern="\d*" onchange="change_quantity(this.id)" onkeyup="change_quantity(this.id)"
                     onclick="this.select();"
                     id="{{ rows['user_active_items_id'] }}" style="width: 40px;"
                     value="{{ rows['active_items_quantity'] }}">

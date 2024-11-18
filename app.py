@@ -42,6 +42,19 @@ def active_list_add_item():
 
 
 
+@app.post('/quick_add_item')
+@helpers.login_required
+def quick_add_item():
+
+    item = request.form.get('item_id')
+    app.logger.error("CUSTOM ERROR LOGGING A")
+    app.logger.error(item)
+
+
+    return
+
+
+
 @app.post('/add_from_group')
 @helpers.login_required
 def add_from_group():
