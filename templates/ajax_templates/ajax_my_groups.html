@@ -15,9 +15,6 @@
             </tr>
             <tr>
                 <td><input type="text" placeholder="New Group" autocomplete="off" name="new_group_name" id="new_group_name"></td>
-                <script>
-                    document.getElementById('new_group_name').select();
-                </script>
                 <td>
                     <input type="submit" value="Add">
                 </td>
@@ -28,32 +25,93 @@
     <br>
 
 
-    <table>
+
+
+    <!-- MAY NEED TO REVAMP HOW FORM SUBMITION WORKS FOR A BETTER USER EXPERIENCE
+         CONSIDER USING BOOTSTRAP MODAL -->
+    <!-- {% for row in groups %}
+    
+        
+    
+    <button class="btn" type="button" data-bs-toggle="collapse" data-bs-target="#{{ row['groups_id'] }}" aria-expanded="false" aria-controls="collapseExample">
+        {{ row['groups_name'] }}
+    </button>
+    <br>
+    <div class="collapse" id="{{ row['groups_id'] }}">
+        <div class="card card-body">
+            {% for group in group_items %}
+            {% if group['groups_id'] == row['groups_id'] %}
         <div>
-            <p>My Groups</p>
+
+            <ul>
+                <li>
+                    <div>
+                        <h4>
+                            {{ group['item_name']}}
+                        </h4>
+                        <p>
+                        <div id="quantity">
+                            Quantity:
+                            <input type="number" onchange="update_quantity(this.id);"
+                                onkeyup="update_quantity(this.id);" onclick="this.select();"
+                                id="{{ group['groups_items_id'] }}" name="new_quantity"
+                                value="{{ group['quantity'] }}" style="width: 40px;">
+                        </div>
+                        </p>
+                    </div>
+                </li>
+            </ul>
+
+            <br>
         </div>
-        <tr>
-            <th>
-                <p>Group id</p>
-            </th>
-            <th>
-                <p>Group Name</p>
-            </th>
 
-        </tr>
+        {% endif %}
+        {% endfor %}
+        </div>
+    </div>
 
 
+
+    {% endfor %} -->
+
+
+
+
+    <table>
+ 
         {% for row in groups %}
 
-
-
-
-
         <tr>
-            <td>{{ row['groups_id'] }}</td>
-
             <td>
-                <p>{{ row['groups_name'] }}
+                <br>
+                <p>
+                    <p class="fs-5 fw-bold">{{ row['groups_name'] }}</p>
+
+                    <form id="add_item_to_group">
+
+
+                        <input type="hidden" name="groups" id="groups" value="{{ row['groups_id'] }}">
+        
+        
+                        <label for="item_to_add">Add to {{ row['groups_name'] }} recipe:</label>
+                        <br>
+                        <input list="items" name="item_to_add" id="item_to_add" autocomplete="off">
+        
+                            <datalist id="items" name="items">
+                                {% for item in users_items %}
+                                <option value="{{ item['item_name'] }}"></option>
+                                {% endfor %}
+                            </datalist>
+        
+        
+        
+        
+                        <label for="quantity">Quantity:</label>
+                        <input name="quantity" id="quantity" type="number" value="1" style="max-width: 50px;">
+                        <input type="submit" value="Add">
+        
+                    </form>
+
                     <br>
                     Ingredients:
 
@@ -64,23 +122,30 @@
                     <ul>
                         <li>
                             <div>
-                                <h4>
-                                    {{ group['item_name']}}
-                                </h4>
-                                <p>
+                                
+                                    
+
                                 <div id="quantity">
-                                    Quantity:
-                                    {{ group['quantity']}}
+                                    
                                     <input type="number" onchange="update_quantity(this.id);"
                                         onkeyup="update_quantity(this.id);" onclick="this.select();"
                                         id="{{ group['groups_items_id'] }}" name="new_quantity"
                                         value="{{ group['quantity'] }}" style="width: 40px;">
+                                        
+                                        {{ group['item_name']}}
                                 </div>
-                                </p>
+
+                                <form id="change_quantity_in_group" method="post">
+                                    <input type="hidden" name="id" value="{{ group['groups_items_id'] }}">
+                                    <input type="hidden" name="value" value="0">
+                                    <button class="btn btn-danger" type="submit">X</button>
+                                </form>
+
+                            
+                                
                             </div>
                         </li>
                     </ul>
-
 
                 </div>
 
@@ -113,36 +178,6 @@
 
         </tr>
 
-        <td>
-
-
-
-            <form id="add_item_to_group">
-
-
-                <input type="hidden" name="groups" id="groups" value="{{ row['groups_id'] }}">
-
-
-                <label for="item_to_add">Add Item to {{ row['groups_name'] }}:</label>
-                <input list="items" name="item_to_add" id="item_to_add" autocomplete="off">
-
-                    <datalist id="items" name="items">
-                        {% for item in users_items %}
-                        <option value="{{ item['item_name'] }}"></option>
-                        {% endfor %}
-                    </datalist>
-
-
-
-
-                <label for="quantity">Choose Amount:</label>
-                <input name="quantity" id="quantity" type="number" value="1">
-                <input type="submit">
-
-            </form>
-
-
-        </td>
 
 
 

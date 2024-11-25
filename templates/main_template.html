@@ -14,7 +14,6 @@
 
 <body class="bg-primary" style="--bs-bg-opacity: .05; height: 100vh; overflow-x: hidden;">
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-    <script>window.jQuery || document.write('<script src="{{url_for('static', filename = 'jquery.js') }}">\x3C/script>')</script>
     <script>$SCRIPT_ROOT = {{ request.script_root|tojson }};</script>
 
     {% block loggedin %}{% endblock %}
@@ -33,6 +32,9 @@
                 </li>
                 <li class="nav-item">
                     <a class="nav-link px-2 text-body-secondary" href="https://www.heroku.com/python?utm_source=google&utm_medium=paid_search&utm_campaign=amer_heraw&utm_content=language-branded-search-rsa&utm_term=heroku%20python&utm_source_platform=GoogleAds&gad_source=1&gclid=Cj0KCQjw99e4BhDiARIsAISE7P89q_6u0FJpuuYFoA0qnr18ELJY5KMH0SQKZQkd-uFysXVLEAknoKsaAh2sEALw_wcB">Hosting From Heroku</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link px-2 text-body-secondary" href="https://aws.amazon.com/ec2/">Hosting AWS</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link px-2 text-body-secondary" href="https://getbootstrap.com/">Styling With Bootstrap</a>
