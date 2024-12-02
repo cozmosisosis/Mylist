@@ -7,19 +7,19 @@
     </div>
 
     <form id="create_group">
-        <table>
-            <tr>
-                <th>
+        
+            
+                
                     <p>Create New Group</p>
-                </th>
-            </tr>
-            <tr>
-                <td><input type="text" placeholder="New Group" autocomplete="off" name="new_group_name" id="new_group_name"></td>
-                <td>
+                
+            
+            
+                <input type="text" placeholder="New Group" autocomplete="off" name="new_group_name" id="new_group_name">
+                
                     <input type="submit" value="Add">
-                </td>
-            </tr>
-        </table>
+                
+            
+        
     </form>
 
     <br>
@@ -77,15 +77,15 @@
 
 
 
-    <table>
+    <div class="container">
  
         {% for row in groups %}
 
-        <tr>
-            <td>
+        
+            
                 <br>
-                <p>
-                    <p class="fs-5 fw-bold">{{ row['groups_name'] }}</p>
+                
+                    <div class="fs-5 fw-bold">{{ row['groups_name'] }}</div>
 
                     <form id="add_item_to_group">
 
@@ -117,29 +117,30 @@
 
                     {% for group in group_items %}
                     {% if group['groups_id'] == row['groups_id'] %}
-                <div>
+                
 
                     <ul>
                         <li>
-                            <div>
-                                
-                                    
+                            <div class="container">
+                                <div class="row">
 
-                                <div id="quantity">
-                                    
-                                    <input type="number" onchange="update_quantity(this.id);"
-                                        onkeyup="update_quantity(this.id);" onclick="this.select();"
-                                        id="{{ group['groups_items_id'] }}" name="new_quantity"
-                                        value="{{ group['quantity'] }}" style="width: 40px;">
-                                        
-                                        {{ group['item_name']}}
-                                </div>
+                                    <div id="quantity" class="col">
+                                        <input type="number" onchange="update_quantity(this.id);"
+                                            onkeyup="update_quantity(this.id);" onclick="this.select();"
+                                            id="{{ group['groups_items_id'] }}" name="new_quantity"
+                                            value="{{ group['quantity'] }}" style="width: 40px;">
+                                            
+                                                {{ group['item_name']}}
+                                            
+                                    </div>
 
-                                <form id="change_quantity_in_group" method="post">
-                                    <input type="hidden" name="id" value="{{ group['groups_items_id'] }}">
-                                    <input type="hidden" name="value" value="0">
-                                    <button class="btn btn-danger" type="submit">X</button>
-                                </form>
+                                    <form class="col" id="change_quantity_in_group" method="post">
+                                        <input type="hidden" name="id" value="{{ group['groups_items_id'] }}">
+                                        <input type="hidden" name="value" value="0">
+                                        <button class="btn btn-danger" type="submit">X</button>
+                                    </form>
+
+                            </div>
 
                             
                                 
@@ -147,28 +148,28 @@
                         </li>
                     </ul>
 
-                </div>
+                
 
                 {% endif %}
                 {% endfor %}
-                </p>
-            </td>
+                
+            
 
 
 
-            <td>
+            
                 <form id="add_from_group_verification">
                     <input type="hidden" name="group_id" id="group_id" value="{{ row['groups_id'] }}">
                     <input type="submit" value="Add to Grocery List">
                 </form>
-            </td>
+            
 
-            <td>
+            
                 <form id="delete_group">
                     <input type="hidden" name="group_to_delete" id="group_to_delete" value="{{ row['groups_id'] }}">
                     <input type="submit" value="Delete group">
                 </form>
-            </td>
+            
 
 
 
@@ -176,11 +177,11 @@
 
 
 
-        </tr>
+        
 
 
 
 
         {% endfor %}
-    </table>
+    </div>
 </div>
