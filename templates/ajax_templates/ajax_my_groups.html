@@ -77,7 +77,7 @@
 
 
 
-    <div class="container">
+    <div class="">
  
         {% for row in groups %}
 
@@ -107,7 +107,7 @@
         
         
                         <label for="quantity">Quantity:</label>
-                        <input name="quantity" id="quantity" type="number" value="1" style="max-width: 50px;">
+                        <input name="quantity" id="quantity" inputmode="numeric" type="number" value="1" style="max-width: 50px;">
                         <input type="submit" value="Add">
         
                     </form>
@@ -125,7 +125,7 @@
                                 <div class="row">
 
                                     <div id="quantity" class="col">
-                                        <input type="number" onchange="update_quantity(this.id);"
+                                        <input type="number" inputmode="numeric" onchange="update_quantity(this.id);"
                                             onkeyup="update_quantity(this.id);" onclick="this.select();"
                                             id="{{ group['groups_items_id'] }}" name="new_quantity"
                                             value="{{ group['quantity'] }}" style="width: 40px;">

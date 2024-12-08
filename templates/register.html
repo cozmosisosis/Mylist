@@ -10,17 +10,8 @@ MyList Account Creation Page
 {% block main %}
 <div>
 
-    <div>
-        {% with messages = get_flashed_messages() %}
-        {% if messages %}
-        {% for message in messages %}
-        {{ message }}
-        {% endfor %}
-        {% endif %}
-        {% endwith %}
-        <br> WARNING!!!! <br> DO NOT USE ANY SENSITIVE INFORMATION (ie real name, password, email). <br>
-        THIS PROJECT IS STILL IN DEVELOPMENT
-    </div>
+        
+        
 
 
     <div class="container-fluid p-0 m-0">
@@ -28,7 +19,7 @@ MyList Account Creation Page
         <div class="row d-flex justify-content-center">
             <!--Small screen logo-->
             <div class="d-block d-lg-none">
-                <div class="border my-3" style="height: 150px;">
+                <div class="border mb-3" style="height: 100px;">
                     
                     <div class="p-3 m-3 ">
 
@@ -42,6 +33,19 @@ MyList Account Creation Page
                 </div>
             </div>
         </div>
+
+        {% with messages = get_flashed_messages() %}
+        <div class="alert alert-danger" role="alert">
+        WARNING!!!!  DO NOT USE ANY SENSITIVE INFORMATION (ie real name, password, email). <br>
+        THIS PROJECT IS STILL IN DEVELOPMENT
+        {% if messages %}
+        <br>
+        {% for message in messages %}
+        {{ message }}
+        {% endfor %}
+        {% endif %}
+        </div>
+        {% endwith %}
 
         <div class="row d-flex justify-content-center">
 
@@ -113,45 +117,6 @@ MyList Account Creation Page
     </div>
 
 
-    <!-- <div>
-        <table>
-            <tr>
-                <th>Username</th>
-                <th>Password</th>
-                <th>Password Verification</th>
-                <th>Email</th>
-                <th>Email Verification</th>
-            </tr>
-            <form >
-                <tr>
-                    <td>
-                        <input type="text" name="username" placeholder="Username" autocomplete="off">
-                    </td>
-                    <td>
-                        <input type="password" name="password" placeholder="Password" autocomplete="off">
-                    </td>
-                    <td>
-                        <input type="password" name="password_verification" placeholder="Password again" autocomplete="off">
-                    </td>
-                    <td>
-                        <input type="text" name="email" placeholder="Email" autocomplete="off">
-                    </td>
-                    <td>
-                        <input type="text" name="email_verification" placeholder="Email again" autocomplete="off">
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <input type="submit" formaction="/register" formmethod="post" value="Submit">
-                        <input type="reset" value="Clear">
-                    </td>
-                    <td>
-                        <a href="/login">Already Have an Account</a>
-                    </td>
-                </tr>
-            </form>
-        </table>
-    </div> -->
 </div>
 
 {% endblock %}

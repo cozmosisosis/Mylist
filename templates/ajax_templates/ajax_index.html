@@ -6,7 +6,7 @@
         {% endif %}
     </div>
 
-    <div>
+    <div class="row">
         <form id="active_list_add_item">
 
             <label for="item_to_add">Add an item to your list:</label>
@@ -26,7 +26,7 @@
         </form>
     </div>
 
-    <div>
+    <div class="row">
         <form id="add_from_group_verification">
 
             <label for="group_id">Add all items from group:</label>
@@ -53,18 +53,18 @@
         </form>
       </div> -->
     
-    <table>
-        <tr>
-            <th>Item Name</th>
-            <th>Origin</th>
-            <th>Quantity</th>
-        </tr>
+        <br>
+        <div class="row fs-5 fw-bold">
+            <div class="col">Item Name</div>
+            <div class="col">Recipe</div>
+            <div class="col">Quantity</div>
+        </div>
         {% for rows in user_active_items %}
-        <tr>
-            <td>
+        <div class="row">
+            <div class="col">
                 {{ rows['item_name'] }}
-            </td>
-            <td>
+            </div>
+            <div class="col">
                 {% if rows['groups_id'] is not none %}
                 {% for group in users_groups %}
                 {% if group['groups_id'] == rows['groups_id'] %}
@@ -79,21 +79,20 @@
                 {% endfor %}
                 {% endif %}
 
-            </td>
-            <td>
-                <input type="number" pattern="\d*" onchange="change_quantity(this.id)" onkeyup="change_quantity(this.id)"
+            </div>
+            <div class="col d-flex">
+                <input type="number" inputmode="numeric" onchange="change_quantity(this.id)" onkeyup="change_quantity(this.id)"
                     onclick="this.select();"
                     id="{{ rows['user_active_items_id'] }}" style="width: 40px;"
                     value="{{ rows['active_items_quantity'] }}">
-            </td>
-            <td>
+
                 <form id="active_list_quantity" method="post">
                     <input type="hidden" name="id" value="{{ rows['user_active_items_id'] }}">
                     <input type="hidden" name="value" value="0">
                     <button class="btn btn-danger" type="submit">X</button>
                 </form>
-            </td>
-        </tr>
+            </div>
+        </div>
         {% endfor %}
-    </table>
+    
 </div>

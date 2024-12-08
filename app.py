@@ -7,6 +7,7 @@ import helpers
 app = Flask(__name__)
 
 app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'
+app.config['SESSION_PERMANENT'] = True
 
 
 
@@ -39,19 +40,6 @@ def active_list_add_item():
 
     helpers.add_item_to_active_list(valid_item['item_id'], session['user_id'], quantity_to_add_int)
     return redirect(url_for('active_list_data'))
-
-
-
-@app.post('/quick_add_item')
-@helpers.login_required
-def quick_add_item():
-
-    item = request.form.get('item_id')
-    app.logger.error("CUSTOM ERROR LOGGING A")
-    app.logger.error(item)
-
-
-    return
 
 
 

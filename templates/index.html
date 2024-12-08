@@ -1,7 +1,6 @@
 {% extends "loggedin_template.html" %}
 
 
-
 {% block title %}
 MyList homepage
 {% endblock %}
@@ -10,24 +9,10 @@ MyList homepage
 {% block main %}
 
 
-<div>
-    <table>
-        <tr>
-            <p>Home Page</p>
-
-        </tr>
-    </table>
-
     <br>
-
-    <div id="primary_data">
-
-    </div>
+    <div id="primary_data"></div>
 
 
-
-
-</div>
 <script src="{{ url_for('static', filename='script_mylist_index.js') }}"></script>
 
 {% endblock %}

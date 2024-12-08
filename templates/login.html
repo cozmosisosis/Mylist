@@ -11,15 +11,9 @@ MyList Login Page
 
 <div>
 
-    <div>
-        {% with messages = get_flashed_messages() %}
-        {% if messages %}
-        {% for message in messages %}
-        {{ message }}
-        {% endfor %}
-        {% endif %}
-        {% endwith %}
-    </div>
+    
+        
+    
 
     
     <div class="container-fluid p-0 m-0">
@@ -27,7 +21,7 @@ MyList Login Page
         <div class="row d-flex justify-content-center">
             <!--Small screen logo-->
             <div class="d-block d-lg-none">
-                <div class="border my-3" style="height: 150px;">
+                <div class="border mb-3" style="height: 100px;">
                     
                     <div class="p-3 m-3 ">
 
@@ -42,6 +36,16 @@ MyList Login Page
             </div>
         </div>
 
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+        <div class="alert alert-primary" role="alert">
+        {% for message in messages %}
+        {{ message }}
+        {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
+
         <div class="row d-flex justify-content-center">
 
             <!--Large screen logo-->
@@ -55,10 +59,6 @@ MyList Login Page
                     <div>
                          <h3>LOGO PLACEHOLDER</h3>
                          <br>
-                    </div>
-
-                    <div>
-                        
                     </div>
         
                 
