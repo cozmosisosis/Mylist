@@ -41,11 +41,12 @@ function change_quantity(id) {
 }
 
 
+
 $(document).on("submit", "form", function(e) {
-    
     var form = $(this);
     var formId = form.attr("id");
     e.preventDefault();
+    // alert("js file")
 
     $.ajax({
         url: $SCRIPT_ROOT + '/' + formId,
@@ -60,3 +61,15 @@ $(document).on("submit", "form", function(e) {
         }
     })
 })
+
+
+
+function submit_ios_fix(e) {
+    // Patch work for datalist submission issue on iphone. Issue occurs
+    // when trying to type in an item that already exists.
+                
+    if (e.code === "Enter" || e.code === "NumpadEnter") {
+        e.preventDefault();
+        document.getElementById("item_submit_button").click();
+    }
+}

@@ -7,10 +7,13 @@
     </div>
 
     <div class="row">
-        <form id="active_list_add_item">
+        <form id="active_list_add_item" action="" method="">
 
             <label for="item_to_add">Add an item to your list:</label>
-            <input list="item" id="item_to_add" name="item_to_add" autocomplete="off"/>
+            <input list="item" id="item_to_add" name="item_to_add" autocomplete="off" 
+            onkeydown="submit_ios_fix(event);" />
+            
+
             
             <datalist id="item" name="item">
                 {% for row in users_items %}
@@ -21,9 +24,11 @@
             
             <label for="quantity">Quantity</label>
             <input type="number" value="1" name="quantity" id="quantity" style="width: 40px;" onclick="this.select();" pattern="\d*" >
-            <input type="submit">
+            <input type="submit" id="item_submit_button">
 
         </form>
+
+
     </div>
 
     <div class="row">
@@ -60,7 +65,8 @@
             <div class="col">Quantity</div>
         </div>
         {% for rows in user_active_items %}
-        <div class="row">
+        
+        <div class="row p-1">
             <div class="col">
                 {{ rows['item_name'] }}
             </div>
@@ -81,7 +87,7 @@
 
             </div>
             <div class="col d-flex">
-                <input type="number" inputmode="numeric" onchange="change_quantity(this.id)" onkeyup="change_quantity(this.id)"
+                <input class="m-1" type="number" inputmode="numeric" onchange="change_quantity(this.id)" onkeyup="change_quantity(this.id)"
                     onclick="this.select();"
                     id="{{ rows['user_active_items_id'] }}" style="width: 40px;"
                     value="{{ rows['active_items_quantity'] }}">
