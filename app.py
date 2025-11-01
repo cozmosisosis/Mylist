@@ -6,6 +6,7 @@ import helpers
 
 app = Flask(__name__)
 
+# Secret key should not be here in real world use
 app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'
 app.config['SESSION_PERMANENT'] = True
 
